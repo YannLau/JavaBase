@@ -10,3 +10,7 @@ macos中管理 java版本的命令行工具 `/usr/libexec/java_home -V`
 		System.out.println("当前有cpu 个数=" + cpuNums);
 
 `System.lineSeparator() == System.getProperty("line.separator")` 获取系统对应的换行符 ==> "\n"
+
+Toolkit.getDefaultToolkit().beep();发出蜂鸣声。
+
+javax.swing.Timer定时器，配合ActionListener接口使用。
