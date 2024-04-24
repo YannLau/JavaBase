@@ -349,6 +349,8 @@ class Teacher implements IG {
 
 6. 在Java9，接口中的方法可以使private方法。private方法可以是静态方法或实例方法，由于私有方法只能在接口本身的方法中使用，所以他们的用途很有限，只是作为接口中其他方法（default）的辅助方法。
 
+7. 如果设计你自己的接口，其中只有一个抽象方法可以用`@FunctionalInterface`来标记这个接口这样做有两个优点，如果你无意中增加了另一个抽象方法，编译器会给出一个错误消息，另外Javadoc页中会指出你的接口是一个函数式接口.
+
    
 
    # Java核心技术卷补充：默认方法细节
@@ -373,6 +375,5 @@ class Teacher implements IG {
 
 1. 超类优先。==如果超类提供了一个具体方法，同名而且有相同参数类型的默认方法会被忽略。==一个类扩展了一个超类，同时实现了一个接口，并从超类和接口继承了相同的方法，例如假设person是一个类，student定义为`class student extent person implements named{}`。在这种情况下只会考虑超类方法，接口的所有默认方法都会被忽略。在我们的例子中，student从person继承了getName方法，named接口是否为getName提供了默认实现并不会带来什么区别，这正是 类优先原则。 
 2. 因此，绝对不能创建一个默认方法重新定义Object类中的某个方法。如，不能为toString或equals定义默认方法，由于类优先原则，这样的方法绝对无法超越Object.toString或Objects.equals.
-3. 以上规则也正是为什么接口Comparator中的 `boolean equals(Object obj)`，方法无需实现的根本原因所在。
+3. 以上规则也正是为什么接口Comparator中的 `boolean equals(Object obj)`，方法无需实现的根本原因所在。Java核心技术卷12P256 介绍了 java API中的一些接口会重新声明Object方法来附加javadoc注释，Comparator API 就是这样一个例子。所以说这才是他在Comparator中再次声明一个equals方法的目的（附加javadoc注释）。
 4. 接口冲突。 如果一个接口提供了一个默认方法，另一个接口提供了一个同名而且参数类型相同的方法（不论是否是默认方法），<u>***必须覆盖这个方法来解决冲突***</u>。 两个接口 如何冲突并不重要，如果至少有一个接口提供了一个实现编译器就会报告错误，必须由程序员解决这个二义性。如果两个方法都是抽象的没有实现，那么本来就必须要覆盖掉，等于不会产生二义性。
-
