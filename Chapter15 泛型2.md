@@ -24,6 +24,12 @@ Java核心技术卷I 12ed 第八章泛型程序设计
 >
 >泛型方法调用的标准形式 `method.<type..>(Para..)`
 >
+>泛型方法和泛型类都会对传入类型进行检查，但是对于泛型方法，虽然son不满足T extends comparble<T>，但是它的父类father满足这个条件，会自动进行向上转换，把son转换为其父类然后继续调用。
+>
+>> 对于泛型方法，当你传入一个类型参数时，编译器会根据该类型参数的约束来进行检查。如果你传入的类型不满足约束条件，编译器会报错。但是在你提到的情况下，如果子类的类型不满足约束条件，但其父类的类型满足约束条件，编译器会允许这种情况发生，因为子类可以被向上转型为父类，所以编译器会把子类当作父类类型来处理。
+>>
+>> 但是需要注意的是，虽然编译器会允许这种情况发生，但是在运行时如果实际传入的对象类型不满足约束条件，可能会导致类型转换异常或者其他运行时异常。
+>
 >一个 类型变量T 或者 通配符？ 可以有多个限定 `<T extends comparable & Serializable, E extends HttpServlet>`
 
 - 易错易混辨析
@@ -46,10 +52,67 @@ Java核心技术卷I 12ed 第八章泛型程序设计
 
 对于Java泛型的转换，需要记住：
 
-1. 虚拟机中没有泛型
+1. 虚拟机中没有泛型，所有对象都属于普通类。
 2. 所有的类型参数都会被替换为它们的限定类型
-3. 会合成桥方法来保持多态。
+3. 会合成桥方法来保持多态。（弥补类型擦除给多态实现带来的困扰）
 4. 为了保证类型的安全性，必要时会插入强制类型转换。
+
+> - 类型擦除
+>
+> 无论何时定义一个泛型类型，都会自动提供一个相应的原始类型(raw type)。这个原始类型的名字就是去掉类型参数后的泛型类型名。类型变量会被擦除，并替换为其限定类型（限定类型指的是 T extends xx 中的类型 xx）。对于无限定的变量则替换为Object。
+>
+> 对于有多个限定类型的(T extends AA&BB&CC&..)，首先，类要写在接口前面。其次，会用第一个进行替换。如果都是接口，就无所谓顺序。
+>
+> 你可能想知道，`class Interval<T extends Comparator & Serializable>`限定切换为`class Interval<T extends Serializable & Comparator>`会发生什么。如果这样做，原始类型会用Serializable替换T，而且编译器会在必要时插入转换为Comparator的强制类型转换。为了提高效率应该将标记(tagging)接口（即没有方法的接口）放在限定列表的末尾。
+>
+> - 转换泛型表达式
+>
+> 编译器将自动插入强制转换来实现泛型，省去了以前的手动的强转。（并且在编译阶段可以进行检查，防止放入错误类型，所以说双重作用）
+>
+> - 转换泛型方法
+>
+> 通过桥方法实现多态。
+
+# 限制与局限性
+
+1. 不能用基本数据类型(int)实例化类型参数(T)。
+2. 运行时类型查询(instanceof)只适用于原始类型(raw List) `aobj instanceof List<String> Error!`
+3. 不能创建参数化类型的数组。`var table = new Pair<String>[10]; Error!!! `但是可以声明
+4. 不能实例化类型变量 `T t = new T(); Error!`
+5. 不能构造泛型数组 `new T[10]; Error!`
+6. 泛型类的静态上下文中类型变量无效
+7. 
+
+
+
+# 为什么说Java没有实现真正的泛型
+
+由于类型擦除，导致无法实现方法的重载。真正意义上的泛型不会导致下面的问题。
+
+<img src="/Users/yannlau/Documents/JavaSet/Java韩顺平/第1阶段_Java900P_韩顺平 + 个人理解积累补充/assets/image-20240429上午100859006.png" alt="image-20240429上午100859006" style="zoom: 50%;" />
+
+```json
+    public void test() {
+
+        List<Integer> list1 = new ArrayList<>();
+        List list2 = list1;
+        list1.add(1); // 此时 list=[1]
+        list2.add("Hello"); //此时 list=[1,"Hello"]
+        //list1.add("World"); Error 不能通过编译器检查
+        System.out.println(list1.get(1)); // 我用使用了泛型的引用去取出 原始类型加入的"Hello",可以打印出 Hello
+        System.out.println(list2.get(0));  // 同样可以打印出 1
+
+        Object s = list1.get(1); //一切正常
+        System.out.println(s.getClass()); //一切正常 打印出 String类型
+
+        System.out.println(list1.get(1).getClass()); // Error!!! 发生运行时的类强转异常
+        // class java.lang.String cannot be cast to class java.lang.Integer
+        // 应该是泛型对类型进行了强转,但是为什么取出来的时候没有发生强转异常的呢?
+        System.out.println(list2.get(0).getClass()); // 没有异常,得到 class java.lang.Integer
+    }
+```
+
+
 
 # 泛型类型的继承规则
 
@@ -68,7 +131,7 @@ Employee[] buddies = new Manager[]{ceo,cfo};
 这是因为数组有特别的保护，如果试图将一个底层员工存储到，buddies[0]时，虚拟机会抛出ArrayStoreException。
 ```
 
-总是可以将参数化类型转化为一个原始类型。也就是说 `Pair`是任何`Pair<Type>`的父类，等价于 `Pair<?>`。
+总是可以将参数化类型转化为一个原始类型。也就是说 `Pair`是任何`Pair<Type>`的父类。
 
 那么这样的话，就会打破上面的例子中的限制。`Pair rawpair = new Pairs<Manager>(); `ok
 
@@ -117,6 +180,26 @@ System.out.println(test.getS());这三句话为啥不会导致错误？
 
 
 <img src="/Users/yannlau/Documents/JavaSet/Java韩顺平/第1阶段_Java900P_韩顺平 + 个人理解积累补充/assets/image-20240428下午83921865.png" alt="image-20240428下午83921865" style="zoom: 33%;" />
+
+# `List、List<Object>、List<?>、List<String>`的区别
+
+从继承关系上来说: 
+
+```java
+List<-List<?><-List<Objection>
+				↑←←←←←← List<String>
+
+List<?> 表明编译器不知道所指向的List中的具体类型是什么，所以除了null什么类型的对象都不允许往里面放。
+List 什么都可以往里面放。
+
+  public void test() {
+  Pair<?> p1 = new Pair<Integer>(1, 2);
+  //p1.setFirst(3); //Error 需要的类型 capture of ? 提供的类型: int
+  Object first = p1.getFirst();
+  Object second = p1.getSecond();
+  //Integer firstInteger = p1.getFirst(); //Error 需要的类型:Integer 提供的类型:capture of ?
+}
+```
 
 # 通配符类型实现泛型类型的继承关系
 
@@ -317,13 +400,29 @@ Pair<?> 是一个泛型类型，但是泛型类型参数是未知的。
 例如，如果你使用 Pair<?>，则无法向其中添加任何元素，因为具体的类型参数是未知的，编译器无法确保添加的元素类型与实际的类型参数兼容。
 ```
 
+# capture of ? 
+
+???
+
+# 为什么反射中常用Class<?> 而不直接用raw的Class
+
+ChatGPT
+
+在反射中常用`Class<?>`而不直接使用原始类型的`Class`，主要是为了保持类型安全性和灵活性。
+
+1. **类型安全性：** 使用原始类型的`Class`意味着你不关心具体的类型信息，可以接受任意类型的`Class`对象。这可能会导致在运行时类型不匹配的错误，因为你无法在编译时对类型进行检查。而使用`Class<?>`表示未知类型，但仍然保留了泛型的信息，编译器会在编译时对类型进行检查，从而保证类型安全。
+2. **灵活性：** 使用`Class<?>`表示未知类型，可以在运行时接受任意类型的`Class`对象。这种灵活性使得你可以编写更加通用的代码，不需要事先知道具体的类型。例如，在编写通用的框架或工具类时，你可能需要处理多种类型的对象，此时使用`Class<?>`可以更加灵活地适应不同的类型。
+3. **与泛型的兼容性：** Java 泛型是通过类型擦除实现的，使用原始类型的`Class`丢失了泛型信息。而使用`Class<?>`保留了泛型的信息，与泛型的使用更加兼容。
+
+综上所述，虽然在某些情况下直接使用原始类型的`Class`可能会更加简洁，但使用`Class<?>`可以提供更好的类型安全性和灵活性，在大多数情况下更推荐使用`Class<?>`。
+
 # 通配符捕获
 
 通配符？不是类型变量。不能编写使用 ？ 作为类型的代码。
 
 但是一些交换操作，必须保存第一个元素。需要使用类型变量。
 
-我们可以编写一个辅助方法：
+我们可以编写一个辅助方法：注意，swapHelper是一个泛型方法，而swap不是，他有一个固定的Pair<?> 类型参数。
 
 ```java
 public static <T> void swapHelper(Pair<T> p){
@@ -337,6 +436,7 @@ public static <T> void swapHelper(Pair<T> p){
 
 ```json
 public static void swap(Pair<?> p){
+  // ? first = p.getFirst(); Error！
   swapHelper(p);
 }
 ```
