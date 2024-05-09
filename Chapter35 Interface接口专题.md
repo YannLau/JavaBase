@@ -343,9 +343,9 @@ class Teacher implements IG {
 
 3. 记录和枚举类不能extends其他类，因为他们隐式地继承了Record类和Enum类。但是可以实现接口。
 
-4. CharSequence接口包含了管理所有字符序列的类的公共方法。String和StringBuilder以及另外一些“string-like”类都实现了这个接口。有一个共同的接口会鼓励程序员编写使用CharSequence接口的方法。哪些方法可以处理String、StringBuilder 和 其他的 类字符串 类的实例。 如果你要处理字符串，而那些操作已经能满足你的任务要求则可以接受CharSequence实例，而不是字符串。
+4. ==CharSequence接口==包含了管理所有字符序列的类的公共方法。String和StringBuilder以及另外一些“string-like”类都实现了这个接口。有一个共同的接口会鼓励程序员编写使用CharSequence接口的方法。哪些方法可以处理String、StringBuilder 和 其他的 类字符串 类的实例。 如果你要处理字符串，而那些操作已经能满足你的任务要求则可以接受CharSequence实例，而不是字符串。
 
-5. 在Java8中允许在接口中增加静态方法。在标准库中，你会看到成对出现的接口和实用工具类，如 Collection和Collections，Path和Paths。但是Java11中，Path接口实现了Paths工具类中等价的静态方法。这样一来，Paths类就不再是必要的了。
+5. 在==Java8中允许在接口中增加静态方法==。在标准库中，你会看到成对出现的接口和实用工具类，如 Collection和Collections，Path和Paths。但是Java11中，Path接口实现了Paths工具类中等价的静态方法。这样一来，Paths类就不再是必要的了。
 
 6. 在Java9，接口中的方法可以使private方法。private方法可以是静态方法或实例方法，由于私有方法只能在接口本身的方法中使用，所以他们的用途很有限，只是作为接口中其他方法（default）的辅助方法。
 
@@ -367,11 +367,11 @@ class Teacher implements IG {
 >
 > 假设Stream方法不是一个默认方法，，那么Bag类将不能编译（因为要实现所有抽象方法，所以必须实现stream）， 因为他没有实现这个新方法为接口增加一个非默认方法，不能保证 ==源代码兼容source compatible==。不过，假设不重新编译这个类而只是使用原先的一个包含这个类的jar文件，这个类仍能正常加载，尽管没有这个新方法程序仍然可以正常构造Bag实例，不会有意外发生。为接口增加方法可以做到二进制兼容。不过如果一个程序在一个Bag实例上调用Stram方法，就会出现一个AbstractMethodError。
 >
-> 将方法实现为一个默认default方法就可以解决这两个问题。Bag类（无需修改）又能正常编译了，另外如果没有重新编译而直接加载这个类，并在一个Bag实例上调用Stram方法则会调用Collection.stream默认方法。
+> 将Collection中新增的stream方法实现为一个默认default方法就可以解决这两个问题。Bag类（无需修改）又能正常编译了，另外如果没有重新编译而直接加载这个类，并在一个Bag实例上调用Stram方法则会调用Collection.stream默认方法。
 
 ### 解决默认方法冲突
 
-如果先在一个接口中将一个方法定义为默认方法，然后又在超累或另一个接口中定义了同样的方法，会发生什么情况？
+如果先在一个接口中将一个方法定义为默认方法，然后又在超类或另一个接口中定义了同样的方法，会发生什么情况？
 
 1. 超类优先。==如果超类提供了一个具体方法，同名而且有相同参数类型的默认方法会被忽略。==一个类扩展了一个超类，同时实现了一个接口，并从超类和接口继承了相同的方法，例如假设person是一个类，student定义为`class student extent person implements named{}`。在这种情况下只会考虑超类方法，接口的所有默认方法都会被忽略。在我们的例子中，student从person继承了getName方法，named接口是否为getName提供了默认实现并不会带来什么区别，这正是 类优先原则。 
 2. 因此，绝对不能创建一个默认方法重新定义Object类中的某个方法。如，不能为toString或equals定义默认方法，由于类优先原则，这样的方法绝对无法超越Object.toString或Objects.equals.

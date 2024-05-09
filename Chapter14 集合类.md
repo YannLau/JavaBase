@@ -14,7 +14,8 @@ P499---P553
 > 写出Person数组扩容示意代码。
 >
 > Person[] pers = new Person[1];
-> pers[0] = new Person;
+> pers[0] = new Person();
+>
 > //增加新的Person对象？
 >
 > Person[] pers2 = new Person[pers.length+1]：//新创建数组
@@ -29,6 +30,14 @@ P499---P553
 
 # 集合的框架体系
 
+Java 的集合类很多，主要分为两大类
+
+如图 ：[背下来]
+
+<img src="/Users/yannlau/Documents/JavaSet/Java韩顺平/第1阶段_Java900P_韩顺平 + 个人理解积累补充/assets/image-20240504下午40600735.png" alt="image-20240504下午40600735" style="zoom:50%;" />
+
+<img src="/Users/yannlau/Documents/JavaSet/Java韩顺平/第1阶段_Java900P_韩顺平 + 个人理解积累补充/assets/image-20240504下午40614594.png" alt="image-20240504下午40614594" style="zoom:50%;" />
+
 - Collection -- 单列集合<单个值>
   - List
     - ArrayList
@@ -39,9 +48,36 @@ P499---P553
     - TreeSet
 - Map--双列集合<键值对>
   - HashMap
+    - LinkedHashMap
   - TreeMap
   - HasTable
-  - Properties
+    - Properties
+
+```java
+package com.hspedu.collection_;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+public class Collection_ {
+  @SuppressWarnings({"all"})
+  public static void main(String[] args) {
+    //老韩解读
+    //1. 集合主要是两组(单列集合 , 双列集合)
+    //2. Collection 接口有两个重要的子接口 List Set , 他们的实现子类都是单列集合
+    //3. Map 接口的实现子类 是双列集合，存放的 K-V
+    //4. 把老师梳理的两张图记住
+    //Collection
+    //Map
+    ArrayList arrayList = new ArrayList();
+    arrayList.add("jack");
+    arrayList.add("tom");
+    HashMap hashMap = new HashMap();
+    hashMap.put("NO1", "北京");
+    hashMap.put("NO2", "上海");
+  }
+}
+```
 
 # Collection 接口和常用方法
 
@@ -65,37 +101,39 @@ P499---P553
 > list.add (true);
 > 
 > remove：删除指定元素;
-> list.remove(0);//删除第一个元素
+> list.remove(0);//删除第一个元素,这是List才有的 Collection没有按照顺序删除的方法。
 > list.remove(true);//指定删除某个元素
->   
+> 
+> System.out.println("list=" + list);
+> 
 > contains：查找元素是否存在;
 > list.contains ("jack");//true
->   
+> 
 > size：获取元素个数
->   list.size();
->   
+> list.size();
+> 
 > isEmpty：判断是否为空
->   list.isEmpty();
->   
+> list.isEmpty();
+> 
 > Clear：清空
->   list.clear();
->   
+> list.clear();
+> 
 > addALL：添加多个元素
->   list.addAll(另一个list);
->   
+> list.addAll(另一个list);
+> 
 > containsALL：查找多个元素是否都存在
->   list.contains(另一个list);
->   
+> list.contains(另一个list);
+> 
 > removeAll：删除多个元素
->   list.removeAll(另一个list);
->   
+> list.removeAll(另一个list);
+> 
 > ```
 
-> Clooection 接口遍历元素方式1---使用 Iterator 迭代器
+> ==Collection 接口遍历元素方式1---使用 Iterator 迭代器==
 >
 > 1） Iterator对象称为迭代器，主要用于遍历 Collection 集合中的元素。
 > 2） 所有实现了Collection接口的集合类都有一个iterator（方法，用以返回一个实现了Iterator接口的对象，即可以返回一个迭代器。
-> 3） Iterator 的结构.［图：］
+> 3） Iterator 的结构.［图］
 > 4） Iterator 仅用于遍历集合，Iterator 本身并不存放对象。
 
 > 迭代器执行原理
@@ -109,40 +147,41 @@ P499---P553
 >
 > Iterator接口的方法
 >
-> hasNext()
+> hasNext() return true if the iteration has more elemnets.
 >
-> next()
+> next() return  the next element in the iteration.
 >
-> remove()
+> remove() remove from the underlying collection the last element returned by the iterator (optional operation)
 >
-> 在调用iterator.next() 方法之前必须要调用iterator.hasNext()
-> 进行检测。若不调用，且下一条记录无效，直接调用it.next() 会抛出NoSuchElementException异常。
+> 在调用iterator.next() 方法之前必须要调用iterator.hasNext()进行检测。若不调用，且下一条记录无效，直接调用it.next() 会抛出NoSuchElementException异常。
 >
 > - `快捷键 itit 快速生成迭代器while循环输出`
 >
-> + `Command/Ctrl + J 提示所有的快捷模版`
+> - `Command/Ctrl + J 提示所有的快捷模版`
 >
 > Java的迭代器和Python的类似, 退出循环后,迭代器指针位置不变.
 >
 > 如果想再次使用,需要重置迭代器.  `iterator = col.iterator();`
 
-> Clooection 接口遍历元素方式2---for循环增强
+> ==Collection 接口遍历元素方式2---for循环增强==
 >
 > 增强for循环，可以代替iterator选代器，特点：增强for就是简化版的iterator
 >
 > 本质一样。只能用于遍历集合或数组。
-> ＞基本语法
-> `for（元素类型 元素名：集合名或数组名）｛`
-> 	`访问元素`
-> `｝`
 >
+> 基本语法
+> 
+> `for（元素类型 元素名：集合名或数组名）｛`
+>	`访问元素`
+> `｝`
+> 
 > 用于Collection的遍历,也可以用于数组遍历.
 >
 > <u>***增强for循环遍历Collection在底层仍然是迭代器.***</u>
 >
 > 可以理解为就是简化版本的迭代器遍历.
 
-# List接口的常用方法
+# List接口
 
 > List接口基本介绍
 >
@@ -157,7 +196,7 @@ P499---P553
 >
 > List 集合里添加了一些根据索引来操作集合元素的方法
 > 1) void add(int index, Object ele): 在index位置插入ele元素
-> 2) boolean addAll(int index, Collection eles): 从索引index位置开始将eles中的所有元素添加进来.
+> 2) boolean addAll(int index, Collection eles): 从索引index位置开始将eles中的所有元素添加进来.(底层用的Collection的toArray方法得到Object数组)
 > 3) Object get(int index)：获取指定index位置的元素
 > 4) int indexOf(Object obj)：返回obj在集合中首次出现的位置
 > 5) int lastlndexOf（Object obj）；返回obj在当前集合中末次出现的位置
@@ -165,7 +204,7 @@ P499---P553
 > 7) Object set(int index, Object ele) : 设置 指定index 位置的元素为ele,相当于是替换.
 > 8) List subList（int fromlndex, int tolndex）：返回从fromlndex到tolndex-1位置的子集合, 遵从前闭后开,最后一个索引取不到的!
 
-> List 的三种遍历方式
+> List 的三种遍历方式 [ArrayList, LinkedList,Vector]
 >
 > `1） 方式一：使用iterator`
 > `Iterator iter = col.iterator;`
@@ -176,7 +215,7 @@ P499---P553
 > `for(Object o:col){`
 > `｝`
 > `3） 方式三：使用普通for`
-> `for(int i=0;i< list.size;i+ +){`
+> `for(int i=0;i<list.size;i++){`
 > `Object object = list.get(i);`
 > `System.out.println(object);`
 > `｝`
@@ -196,7 +235,7 @@ P499---P553
 >
 > transient 关键字 表示短暂的暂时的,表示该属性不会被序列化. (IO流中的知识)
 >
-> 2） 当创建对象时，如果使用的是无参构造器，则初始elementData容量为0 (jdk7분10)
+> 2） 当创建对象时，如果使用的是无参构造器，则初始elementData容量为0 (jdk7是10)
 >
 > 3） 当添加元素时：先判断是否需要扩容，如果需要扩容，则调用grow方法，否则直接添加元素到合适位置
 >
@@ -205,6 +244,28 @@ P499---P553
 > 5） 如果使用的是指定容量capacity的构造器，则初始elementData容量为capacity
 >
 > 6）如果使用的是指定容量capacity的构造器，如果需要扩容，则直接扩容elementData为1.5倍。
+>
+> ```java
+>   private int newCapacity(int minCapacity) {
+>       // overflow-conscious code
+>       int oldCapacity = elementData.length;
+>       int newCapacity = oldCapacity + (oldCapacity >> 1);
+>       if (newCapacity - minCapacity <= 0) {
+>           if (elementData == DEFAULTCAPACITY_EMPTY_ELEMENTDATA)
+>               return Math.max(DEFAULT_CAPACITY, minCapacity);
+>           if (minCapacity < 0) // overflow
+>               throw new OutOfMemoryError();
+>           return minCapacity;
+>       }
+>       return (newCapacity - MAX_ARRAY_SIZE <= 0)
+>           ? newCapacity
+>           : hugeCapacity(minCapacity);//hugeCapacity让数组最大可以是Integer.MaxValue
+>   }
+> ```
+>
+> ![image-20240504下午54555725](/Users/yannlau/Documents/JavaSet/Java韩顺平/第1阶段_Java900P_韩顺平 + 个人理解积累补充/assets/image-20240504下午54555725.png)
+>
+> ![image-20240504下午54616889](/Users/yannlau/Documents/JavaSet/Java韩顺平/第1阶段_Java900P_韩顺平 + 个人理解积累补充/assets/image-20240504下午54616889.png)
 
 ![image-20240209下午15729799](/Users/yannlau/Library/Application Support/typora-user-images/image-20240209下午15729799.png)
 
@@ -231,6 +292,63 @@ P499---P553
 >    ```
 >
 > 4. 在开发中，需要线程同步安全时，考虑使用Vector
+>
+> ```java
+> public class Vector_ {
+>   public static void main(String[] args) {
+>     //无参构造器
+>     //有参数的构造
+>     Vector vector = new Vector(8);
+>     for (int i = 0; i < 10; i++) {
+>       vector.add(i);
+>     }
+>     vector.add(100);
+>     System.out.println("vector=" + vector);
+>     //老韩解读源码
+>     //1. new Vector() 底层
+>     /*
+>     public Vector() {
+>     	this(10);
+>     }
+>     补充：如果是 Vector vector = new Vector(8);
+>     走的方法:
+>     public Vector(int initialCapacity) {
+>     this(initialCapacity, 0);
+>     }
+>     2. vector.add(i)
+>     2.1 //下面这个方法就添加数据到 vector 集合
+>     public synchronized boolean add(E e) {
+>     modCount++;
+>     ensureCapacityHelper(elementCount + 1);
+>     elementData[elementCount++] = e;
+>     return true;
+>     }
+>     2.2 //确定是否需要扩容 条件 ： minCapacity - elementData.length>0
+>     private void ensureCapacityHelper(int minCapacity) {
+>     // overflow-conscious code
+>     if (minCapacity - elementData.length > 0)
+>     grow(minCapacity);
+>     }
+>     2.3 //如果 需要的数组大小 不够用，就扩容 , 扩容的算法
+>     //newCapacity = oldCapacity + ((capacityIncrement > 0) ?
+>     // capacityIncrement : oldCapacity);
+>     //就是扩容两倍. private void grow(int minCapacity) {
+>     // overflow-conscious code
+>     int oldCapacity = elementData.length;
+>     int newCapacity = oldCapacity + ((capacityIncrement > 0) ?
+>     capacityIncrement : oldCapacity);
+>     if (newCapacity - minCapacity < 0)
+>     newCapacity = minCapacity;
+>     if (newCapacity - MAX_ARRAY_SIZE > 0)
+>     newCapacity = hugeCapacity(minCapacity);
+>     elementData = Arrays.copyOf(elementData, newCapacity);
+>     }
+>     */
+>   }
+> }
+> ```
+>
+> 
 
 > Vector 和 ArrayList 比较
 
@@ -262,6 +380,105 @@ new Vector(x,y); x指定初始大小,y指定每次扩容的大小
 > `remove();` // 默认删除第一个元素
 >
 > 其他方法和迭代器 跟前面的ArrayList一样
+>
+> ```java
+> package com.hspedu.list_;
+> import java.util.Iterator;
+> import java.util.LinkedList;
+> /**
+> * @author 韩顺平
+> * @version 1.0
+> */
+> @SuppressWarnings({"all"})
+> public class LinkedListCRUD {
+>   public static void main(String[] args) {
+>     LinkedList linkedList = new LinkedList();
+>     linkedList.add(1);
+>     linkedList.add(2);
+>     linkedList.add(3);
+>     System.out.println("linkedList=" + linkedList);
+>     //演示一个删除结点的
+>     linkedList.remove(); // 这里默认删除的是第一个结点
+>     //linkedList.remove(2);
+>     System.out.println("linkedList=" + linkedList);
+>     //修改某个结点对象
+>     linkedList.set(1, 999);
+>     System.out.println("linkedList=" + linkedList);
+>     //得到某个结点对象
+>     //get(1) 是得到双向链表的第二个对象
+>     Object o = linkedList.get(1);
+>     System.out.println(o);//999
+>     //因为 LinkedList 是 实现了 List 接口, 遍历方式
+>     System.out.println("===LinkeList 遍历迭代器====");
+>     Iterator iterator = linkedList.iterator();
+>     while (iterator.hasNext()) {
+>       Object next = iterator.next();
+>       System.out.println("next=" + next);
+>     }
+>     System.out.println("===LinkeList 遍历增强 for====");
+>     for (Object o1 : linkedList) {
+>       System.out.println("o1=" + o1);
+>     }
+>     System.out.println("===LinkeList 遍历普通 for====");
+>     for (int i = 0; i < linkedList.size(); i++) {
+>       System.out.println(linkedList.get(i));
+>     }
+>     //老韩源码阅读. 
+>     /* 1. LinkedList linkedList = new LinkedList();
+>     public LinkedList() {}
+>     2. 这时 linkeList 的属性 first = null 
+>       3. 执行 添加
+>     public boolean add(E e) {
+>     linkLast(e);
+>     return true;
+>     }
+>     4.将新的结点，加入到双向链表的最后
+>     void linkLast(E e) {
+>     final Node<E> l = last;
+>     final Node<E> newNode = new Node<>(l, e, null);
+>     last = newNode;
+>     if (l == null)
+>     first = newNode;
+>     else
+>     l.next = newNode;
+>     size++;
+>     modCount++;
+>     }
+>     */
+>         /*
+>     老韩读源码 linkedList.remove(); // 这里默认删除的是第一个结点
+>     1. 执行 removeFirst
+>     public E remove() {
+>     return removeFirst();
+>     }
+>     2. 执行
+>     public E removeFirst() {
+>     final Node<E> f = first;
+>     if (f == null)
+>     throw new NoSuchElementException();
+>     return unlinkFirst(f);
+>     }
+>     3. 执行 unlinkFirst, 将 f 指向的双向链表的第一个结点拿掉
+>     private E unlinkFirst(Node<E> f) {
+>     // assert f == first && f != null;
+>     final E element = f.item;
+>     final Node<E> next = f.next;
+>     f.item = null;
+>     f.next = null; // help GC
+>     first = next;
+>     if (next == null)
+>     last = null;
+>     else
+>     next.prev = null;
+>     size--;
+>     modCount++;
+>     return element;
+>     }
+>     */
+>   }
+> }
+> 
+> ```
 
 # ArrayList和LinkedList比较
 
@@ -281,7 +498,7 @@ new Vector(x,y); x指定初始大小,y指定每次扩容的大小
 > Set 接口基本介绍
 >
 > 1. 无序（添加和取出的顺序不一致），没有索引
-> 2. 不允许重复元素，所以最多包含一个null,可以多次添加,但是set中不会多
+> 2. 不允许重复元素，所以最多包含一个null,可以多次添加,但是set中不会有多个null
 > 3. JDK API中Set接口的常见实现类有：HashSet和TreeSet
 
 > 常用方法
@@ -306,14 +523,14 @@ new Vector(x,y); x指定初始大小,y指定每次扩容的大小
 >    2. 增强for
 >    3. 不能用get(index)的普通循环方法了!
 
-# HashSet
+# HashSet(底层是只有k没有v的HashMap)
 
 > HashSet全面说明
 >
 > 1. HashSet实现了Set接口
-> 2. HashSet实际上是HashMap!
->    `public Hashset(){map = new HashMap<>();`
-> 3. 可以存放nul值，但是只能有一个null
+> 2. HashSet实际上是HashMap! HashMap底层是（数组＋链表＋红黑树）
+>    `public Hashset(){map = new HashMap<>();}`
+> 3. 可以存放null值，但是只能有一个null
 > 4. HashSet不保证元素是有序的,取决于hash后，再确定索引的结果
 > 5. 不能有重复元素/对象.在前面 Set 接口使用已经讲过
 
@@ -324,13 +541,32 @@ new Vector(x,y); x指定初始大小,y指定每次扩容的大小
 > 2.如果添加成功，返回 true，否则返回false
 >
 > 如果添加了重复元素会返回False
+>
+> 可以通过 remove 指定删除哪个对象
 
+> ```java
+> set = new HashSet();
+> System.out.println("set=" + set);//0
+> //4 Hashset 不能添加相同的元素/数据?
+> set.add("lucy");//添加成功
+> set.add("lucy");//加入不了
+> set.add(new Dog("tom"));//OK
+> set.add(new Dog("tom"));//Ok
+> System.out.println("set=" + set)
+> ```
+>
 > 经典面试题
 >
-> set.add (new String("hsp"));//ok
-> set.add（new String（"hsp"））；//加入不了.
+> set.add(new String("hsp"));//ok
+> set.add(new String("hsp"))；//加入不了.
 >
 > 看源码才能解决!
+>
+> 个人猜测：将一个对象散列存储，应该用到了hashCode和equals方法。可以自定义两个对象是否算同一个。
+
+>  HashSet 底层机制说明
+>
+> ![image-20240504下午72725526](/Users/yannlau/Documents/JavaSet/Java韩顺平/第1阶段_Java900P_韩顺平 + 个人理解积累补充/assets/image-20240504下午72725526.png)
 
 > HashSet 扩容机制
 >
@@ -351,7 +587,7 @@ new Vector(x,y); x指定初始大小,y指定每次扩容的大小
 >
 >    ```java
 >    set.add("java");
->    
+>
 >    public boolean add(E e) {//e = "java"
 >    	return map.put(e,PRESENT)==null;
 >      //PRESENT = static final Object PRESENT = new Object();
@@ -370,12 +606,176 @@ new Vector(x,y); x指定初始大小,y指定每次扩容的大小
 > 4. 执行 putVal(); 方法
 >
 >    该方法的作用是 判断size,调整size,resize(),判断重复,new Node放入Node[] ,是否转成红黑树
+>
+> ```java
+> package com.hspedu.set_;
+> import java.util.HashSet;
+> /**
+> * @author 韩顺平
+> * @version 1.0
+> */
+> @SuppressWarnings({"all"})
+> public class HashSetSource {
+>   public static void main(String[] args) {
+>     HashSet hashSet = new HashSet();
+>     hashSet.add("java");//到此位置，第 1 次 add 分析完毕. hashSet.add("php");//到此位置，第 2 次 add 分析完毕
+>     hashSet.add("java");
+>     System.out.println("set=" + hashSet);
+>     /*
+> 老韩对 HashSet 的源码解读
+> 1. 执行 HashSet()
+> public HashSet() {
+> map = new HashMap<>();
+> }
+> 2. 执行 add()
+> public boolean add(E e) {//e = "java"
+> return map.put(e, PRESENT)==null;//(static) PRESENT = new Object();
+> }
+> 3.执行 put() , 该方法会执行 hash(key) 得到 key 对应的 hash 值 
+> 算法 h = key.hashCode()) ^ (h >>> 16)
+> public V put(K key, V value) {//key = "java" value = PRESENT 共享
+> return putVal(hash(key), key, value, false, true);
+> }
+> 4.执行 putVal
+> final V putVal(int hash, K key, V value, boolean onlyIfAbsent, boolean evict) {
+> Node<K,V>[] tab; Node<K,V> p; int n, i; //定义了辅助变量
+> //table 就是 HashMap 的一个数组，类型是 Node[]
+> //if 语句表示如果当前 table 是 null, 或者 大小=0
+> //就是第一次扩容，到 16 个空间. if ((tab = table) == null || (n = tab.length) == 0)
+> n = (tab = resize()).length;
+> //(1)根据 key，得到 hash 去计算该 key 应该存放到 table 表的哪个索引位置
+> //并把这个位置的对象，赋给 p
+> //(2)判断 p 是否为 null
+> //(2.1) 如果 p 为 null, 表示还没有存放元素, 就创建一个 Node (key="java",value=PRESENT)
+> //(2.2) 就放在该位置 tab[i] = newNode(hash, key, value, null)
+> if ((p = tab[i = (n - 1) & hash]) == null)
+> tab[i] = newNode(hash, key, value, null);
+> else {
+> //一个开发技巧提示： 在需要局部变量(辅助变量)时候，在创建
+> Node<K,V> e; K k; //
+> //如果当前索引位置对应的链表的第一个元素和准备添加的 key 的 hash 值一样
+> //并且满足 下面两个条件之一:
+> //(1) 准备加入的 key 和 p 指向的 Node 结点的 key 是同一个对象
+> //(2) p 指向的 Node 结点的 key 的 equals() 和准备加入的 key 比较后相同
+> //就不能加入
+> if (p.hash == hash &&
+> ((k = p.key) == key || (key != null && key.equals(k))))
+> e = p;
+> //再判断 p 是不是一颗红黑树, //如果是一颗红黑树，就调用 putTreeVal , 来进行添加
+> else if (p instanceof TreeNode)
+> e = ((TreeNode<K,V>)p).putTreeVal(this, tab, hash, key, value);
+> else {//如果 table 对应索引位置，已经是一个链表, 就使用 for 循环比较
+> //(1) 依次和该链表的每一个元素比较后，都不相同, 则加入到该链表的最后
+> // 注意在把元素添加到链表后，立即判断 该链表是否已经达到 8 个结点
+> // , 就调用 treeifyBin() 对当前这个链表进行树化(转成红黑树)
+> // 注意，在转成红黑树时，要进行判断, 判断条件
+> // if (tab == null || (n = tab.length) < MIN_TREEIFY_CAPACITY(64))
+> // resize();
+> // 如果上面条件成立，先 table 扩容. // 只有上面条件不成立时，才进行转成红黑树
+> //(2) 依次和该链表的每一个元素比较过程中，如果有相同情况,就直接 break
+> for (int binCount = 0; ; ++binCount) {
+> if ((e = p.next) == null) {
+> p.next = newNode(hash, key, value, null);
+> if (binCount >= TREEIFY_THRESHOLD(8) - 1) // -1 for 1st
+> treeifyBin(tab, hash);
+> break;
+> }
+> if (e.hash == hash &&
+> ((k = e.key) == key || (key != null && key.equals(k))))
+> break;
+> p = e;
+> }
+> }
+> if (e != null) { // existing mapping for key
+> V oldValue = e.value;
+> if (!onlyIfAbsent || oldValue == null)
+> e.value = value;
+> afterNodeAccess(e);
+> return oldValue;
+> }
+> }
+> ++modCount;
+> //size 就是我们每加入一个结点 Node(k,v,h,next), size++
+> if (++size > threshold)
+> resize();//扩容
+> afterNodeInsertion(evict);
+> return null;
+> }
+> */
+>   }
+> }
+> ```
+>
+> 
 
 > HashSet 扩容细节
 >
 > 1. HashSet底层是HashMap，第一次添加时，table 数组扩容到16，临界值（threshold）是16*加载因子（loadFactor）是0.75 = 12
 > 2. 如果table 数组使用到了临界值 12.就会扩容到 16*2 = 32， 新的临界值就是32*0.75 = 24，依次类推
 > 3. 在Java8中，如果一条链表的元素个数到达 TREEIFY_THRESHOLD（默认是8），并且table的大小 >=MIN_TREEIFY_CAPACITY（默认64），就会进行树化（红黑树），否则仍然采用数组扩容机制
+>
+> ```java
+> package com.hspedu.set_;
+> import java.util.HashSet;
+> import java.util.Objects;
+> /**
+> * @author 韩顺平
+> * @version 1.0
+> */
+> @SuppressWarnings({"all"})
+> public class HashSetIncrement {
+>   public static void main(String[] args) {
+>     /*
+> HashSet 底层是 HashMap, 第一次添加时，table 数组扩容到 16，
+> 临界值(threshold)是 16*加载因子(loadFactor)是 0.75 = 12
+> 如果 table 数组使用到了临界值 12,就会扩容到 16 * 2 = 32
+> 新的临界值就是 32*0.75 = 24, 依次类推
+> */
+>     HashSet hashSet = new HashSet();
+>     // for(int i = 1; i <= 100; i++) {
+>     // hashSet.add(i);//1,2,3,4,5...100
+>     // }
+>     /*
+> 在 Java8 中, 如果一条链表的元素个数到达 TREEIFY_THRESHOLD(默认是 8 )，
+> 并且 table 的大小 >= MIN_TREEIFY_CAPACITY(默认 64),就会进行树化(红黑树), 否则仍然采用数组扩容机制
+> */
+>     // for(int i = 1; i <= 12; i++) {
+>     // hashSet.add(new A(i));//
+>     // }
+>     /*
+> 当我们向 hashset 增加一个元素，-> Node -> 加入 table , 就算是增加了一个 size++
+> */
+>     for(int i = 1; i <= 7; i++) {//在 table 的某一条链表上添加了 7 个 A 对象
+>       hashSet.add(new A(i));//
+>     }
+>     for(int i = 1; i <= 7; i++) {//在 table 的另外一条链表上添加了 7 个 B 对象
+>       hashSet.add(new B(i));//
+>     }
+>   }
+> }
+> class B {
+>   private int n;
+>   public B(int n) {
+>     this.n = n;
+>   }
+>   @Override
+>   public int hashCode() {
+>     return 200;
+>   }
+> }
+> class A {
+>   private int n;
+>   public A(int n) {
+>     this.n = n;
+>   }
+>   @Override
+>   public int hashCode() {
+>     return 100;
+>   }
+> }
+> ```
+>
+> 
 
 两个对象的hashcode一样,一定加不进去,内容equals一样,但hashcode不一样,分两种情况:
 
@@ -385,7 +785,7 @@ new Vector(x,y); x指定初始大小,y指定每次扩容的大小
 
 `Objects.hash(Object x......可变参数);  根据x和y生成 hashcode`
 
-# LinkedHashSet
+# LinkedHashSet（数组table+双向链表=有序）
 
 > LinkedHashSet的全面说明
 >
@@ -399,7 +799,7 @@ new Vector(x,y); x指定初始大小,y指定每次扩容的大小
 > 1. 在LinkedHastSet 中维护了一个hash表和双向链表
 >    （ LinkedHashSet 有 head 和 tail）
 > 2. 每一个节点有 before 和 after 属性，这样可以形成双向链表
-> 3. 在添加一个元素时，先求hash值，在求索引，确定该元素在table的位置，然后将添加的元素加入到双向链表（如果已经存在，不添加［原则和hashset一样］）
+> 3. 在添加一个元素时，先求hash值，再求索引，确定该元素在table的位置，然后将添加的元素加入到双向链表（如果已经存在，不添加［原则和hashset一样］）
 >    tail.next = newElement // 示意代码
 >    newElement.pre = tail
 >    tail = newEelment;
@@ -493,17 +893,32 @@ new Vector(x,y); x指定初始大小,y指定每次扩容的大小
 >      Iterator iterator = keyset.iterator();
 >    while(iterator.hasNext()){
 >      Object next = iterator.next();
+>      Sout(key + "-" + map.get(key)); 
 >    }
 >    ```
 >
 > 2. 把所有的values取出
 >
 >    ```java
->    Collection values = map. values);
+>    Collection values = map. values();
 >    //这里可以使用所有的Collections使用的遍历方法
 >    
 >    1.增强for
->    2.iterator
+>      2.iterator
+>    
+>      //这里可以使用所有的 Collections 使用的遍历方法
+>      //(1) 增强 for
+>      System.out.println("---取出所有的 value 增强 for----");
+>    for (Object value : values) {
+>      System.out.println(value);
+>    }
+>    //(2) 迭代器
+>    System.out.println("---取出所有的 value 迭代器----");
+>    Iterator iterator2 = values.iterator();
+>    while (iterator2.hasNext()) {
+>      Object value  = iterator2.next();
+>      System.out.println(value);
+>    }
 >    ```
 >
 > 3. 通过EntrySet获得所有的 K-V
@@ -546,6 +961,8 @@ new Vector(x,y); x指定初始大小,y指定每次扩容的大小
 > table的大小 >= MIN_TREEIFY_CAPACITY（默认为64）.就会进行树化（红黑树）
 > 7 ) 当红黑树节点少于8又会剪枝变回链表
 
+![image-20240505上午105113913](/Users/yannlau/Documents/JavaSet/Java韩顺平/第1阶段_Java900P_韩顺平 + 个人理解积累补充/assets/image-20240505上午105113913.png)
+
 # HashTable
 
 ![image-20240210下午42205609](/Users/yannlau/Library/Application Support/typora-user-images/image-20240210下午42205609.png)
@@ -553,7 +970,7 @@ new Vector(x,y); x指定初始大小,y指定每次扩容的大小
 > 基本介绍
 >
 > 1） 存放的元素是键值对：即K-V
-> 2） hashtable的<u>***键和值都不能为null***</u>
+> 2） ==hashtable的<u>***键和值都不能为null***</u>==
 > 3） hashTable 使用方法基本上和HashMap一样
 > 4） <u>***hashTable 是线程安全的，hashMap 是线程不安全的***</u>
 
@@ -568,7 +985,7 @@ new Vector(x,y); x指定初始大小,y指定每次扩容的大小
 > 5. 当 if（count >= threshold）满足时，就进行扩容
 > 6. 按照 int newCapacity = （oldCapacity << 1） + 1；的大小扩容.
 
-> java 的 Hashtable扩容后，原来数组位置上的元素会重新计算index吗？位置是否发生改变？
+> java 的 Hashtable 扩容后，原来数组位置上的元素会重新计算index吗？位置是否发生改变？
 >
 > ChatGPT
 >
@@ -680,7 +1097,7 @@ if (cpr != null) {
 > 4) Object min(Collection, Comparator)
 > 5) int frequency（Collection, Object）：返回指定集合中指定元素的出现次数
 > 6) void copy（List dest, List src）：将src中的内容复制到dest中
->   //为了完成一个完整拷贝，我们需要先给dest 赋值，大小和List.size()一样,要不然报错index越界
+>     //为了完成一个完整拷贝，我们需要先给dest 赋值，大小和List.size()一样,要不然报错index越界
 > 7) boolean replaceAlI（List list, Object oldVal, Object newVal）：使用新值替换 List 对象的所有旧值
 
 ![image-20240210下午104315506](/Users/yannlau/Library/Application Support/typora-user-images/image-20240210下午104315506.png)
