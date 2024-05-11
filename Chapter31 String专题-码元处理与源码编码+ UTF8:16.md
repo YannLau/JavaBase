@@ -197,7 +197,7 @@ UTF-16
 
   如果出现乱码： • 要么是上图1和2的编码不兼容 • 要么是上图5和6的编码不兼容
 
-> 我发现了一个问题，嗯，如果你用的是UTF杠八去写源码，然后用的是GBK的方式去编译的话是不会报错的，因为原文件中的关键字等控制语句都是ASCII可以包含的，并且UTF-8、GBK在那一部分都是兼容的， 因此解析不会出现问题，唯一会出现问题的就是你的字符串的字面量会解析成错误的，当然了，如果你的字符串字面全都是ASCII范围内的，因为互相兼容也不会出错，但是如果有中文的话就会导致乱码。
+> 我发现了一个问题，嗯，如果你用的是UTF-8去写源码，然后用的是GBK的方式去编译的话是不会报错的，因为原文件中的关键字等控制语句都是ASCII可以包含的，并且UTF-8、GBK在那一部分都是兼容的， 因此解析不会出现问题，唯一会出现问题的就是你的字符串的字面量会解析成错误的，当然了，如果你的字符串字面全都是ASCII范围内的，因为互相兼容也不会出错，但是如果有中文的话就会导致乱码。
 
 
 
@@ -226,7 +226,7 @@ Java String API + Character API
 | char charAt(int index)                                       | 返回给定位置的代码单元                                       | 代码单元的index                                              |
 | int codePointAt(int index)                                   | 返回给定位置的码点值（高码位会给出unicode码，低码位没法给，就返回原码元值） | 代码单元的index                                              |
 | int offsetByCodePoints(int startIndex,int cpCount)           | 返回从startIndex开始，cpCount个码点后的码点索引              | 代码单元的index                                              |
-| int Character.charCount(int codepoint)                       | 返回给定码点值需要几个码元来表示                             |                                                              |
+| int Character.charCount(int codepoint)                       | 返回给定码点值需要几个码元来表示                             | 用来遍历Unicode字符串时对index累加                           |
 | boolean Character.isSurrogate(char c)                        | 返回给的char是否是一个替代区域                               |                                                              |
 | InputStream codePoints()                                     | 将这个字符串的码点作为一个流返回。代用 toArray 将它们放在一个int数组中。 |                                                              |
 | new String(int[] codePoints,int offset,int count)            | 用数组中从offset开始的count个码点构造一个字符串。            |                                                              |
@@ -241,6 +241,28 @@ Java String API + Character API
 |                                                              |                                                              |                                                              |
 |                                                              |                                                              |                                                              |
 |                                                              |                                                              |                                                              |
+
+# Java核心技术卷12ed P48 中遍历字符串码点的方法
+
+
+
+如果想要遍历一个字符串，并且一次查看每一个码点，可以使用以下语句：
+
+```java
+int cp = sentence.codePointAt(i);
+i += Character.charCount(cp);
+```
+
+也可以使用一些语句进行反向遍历：
+
+```java
+i--;
+if(Character.isSurrogate(sentence.charAt(i)))
+  i--;
+int cp = sentence.codePointAt(i);
+```
+
+显然，这很麻烦。更容易的方法是使用codePoints方法。他会生成int值的一个“流”，每个int值对应一个码点。可以将流转换为一个数组，再完成遍历。
 
 # StringBUffer & StringBuilder
 

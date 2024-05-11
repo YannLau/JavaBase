@@ -6,15 +6,15 @@ P444----P459
 
 1. num1 / num2 => 10 / 0
 2. 当执行到 num1 / num2 因为 num2 = 0，程序就会出现（抛出）异常 ArithmeticException
-3. 当抛出异常后，程序就退出，崩溃了，下面的代码就不在执行
+3. 当抛出异常后，程序就退出，崩溃了，下面的代码就不再执行
 4. 大家想想这样的程序好吗？不好，不应该出现了一个不算致命的问题，就导致整个系统崩溃
-5. java 设计者，提供了一个叫 异常处理机制来解决该问题
+5. java 设计者，提供了一个叫 异常处理机制来解决该问题。
 
 如果程序员，认为一段代码可能出现异常/问题，可以使用`try-catch`异常处理机制来解决 , 从而保证程序的健壮性 .
 
 > 方法操作:
 >
-> 将代码块选中->快捷键 command option T ->选择 try-catch
+> 将代码块选中 -> 快捷键 command option T -> 选择 try-catch
 
 6. 如果进行异常处理，那么即使出现了异常，程序可以继续执行.
 
@@ -49,7 +49,7 @@ try {
 > 1. 异常分为两大类，运行时异常 和 编译时异常.
 > 2. 运行时异常，编译器不要求强制处置的异常。一股是指编程时的逻辑错误，是程序员应该避免其出现的异常 . java.lang.RuntimeException类及它的子类都是运行时异常
 > 3. 对于运行时异常 , 可以不作处理，因为这类异常很普遍，若全处理可能会对程序的可读性和运行效率产生影响
-> 4. 编译时异常，是编译器要求必须处置的异常。
+> 4. 编译时异常，是编译器要求必须处置的异常。==就是你必须要处理或者抛出的异常==
 
 # 常见的异常
 
@@ -99,13 +99,13 @@ try {
 > ```java
 > try {
 > 代码/可能有异常
-> }catch(Exception e) {
+> } catch(Exception e) {
 > //捕获到异常
 > //1.当异常发生时
 > //2.系统将异常封装成Exception 对象e，传递给catch
 > //3.得到异常后,程序员自己处理
 > //4.注意,如果没有发生异常,catch 代码块不执行!
-> }finally{
+> } finally {
 >  //不管try代码块是否有异常发生，始终要执行finally 
 >  //通常将释放资源的代码,放在 finally 中执行.
 > }
@@ -114,7 +114,7 @@ try {
 > throws 处理机制示意图
 >
 > 1. try-catch-finally 和 throws 二选一
-> 2. 如果程序员，没有显示是处理异常，默认throws (to JVM)
+> 2. 如果程序员，没有显式地处理异常，默认throws (to JVM)
 >
 > ![image-20240207下午45010072](/Users/yannlau/Library/Application Support/typora-user-images/image-20240207下午45010072.png)
 
@@ -132,10 +132,10 @@ try {
 > try-catch 方式处理异常--注意事项
 >
 > 1） 如果异常发生了，则异常发生后面的代码不会执行，直接进入到catch块.  类似于 break;
-> 2）如果异常没有发生，则顺序执行try的代码块，不会进入到catch.
+> 2） 如果异常没有发生，则顺序执行try的代码块，不会进入到catch.
 > 3） 如果希望不管是否发生异常，都执行某段代码（比如关闭连接，释放资源等）则使用如下代码-  finally｛｝
 >
-> 4） 可以有多个catch语句，捕获不同的异常（进行不同的业务处理），要求父类异常在后，子类异常在前，比如（Exception 在后，NullPointerException 在前），如果发生异常，只会匹配一个catch
+> 4） 可以有多个catch语句，捕获不同的异常（进行不同的业务处理），==要求父类异常在后，子类异常在前==，比如（Exception 在后，NullPointerException 在前），如果发生异常，只会匹配一个catch
 >
 > ```java
 > try {
@@ -145,20 +145,22 @@ try {
 > 	int n1 = 10;
 > 	int n2 = 0;
 > 	int res = n1 / n2;//ArithmeticException
->   
+> 
 > } catch(NullPointerException e){
->   
+> 
 > 	System.out.println("空指针异常=" + e.getMessage());
 > 
 > } catch(AtithmeticException e){
-> 	
->   System.out.println("算数异常=" + e.getMessage());
+> 
+> 	System.out.println("算数异常=" + e.getMessage());
 > 
 > } catch(Exception e) {  //父类异常
->   	System.out.println(e.getMessage());
-> } finally {
 >   
->   //释放资源等操作...
+> 	System.out.println(e.getMessage());
+>   
+> } finally {
+> 
+> //释放资源等操作...
 > 
 > }
 > ```
@@ -169,41 +171,41 @@ try {
 >
 > ```java
 > public static int test(){
->         int i = 1;
->         try {
->             String w = null;
->             w.charAt(2);
->         } catch (NullPointerException e) {
->             System.out.println("此时在 NullPointerException 的 catch 中 i = " + i);
->             return ++i;
->         } finally {
->             System.out.println("此时在 finally 中 i = " + i);
->             return ++i;
->         }
->     }
+>      int i = 1;
+>      try {
+>          String w = null;
+>          w.charAt(2);
+>      } catch (NullPointerException e) {
+>          System.out.println("此时在 NullPointerException 的 catch 中 i = " + i);
+>          return ++i;
+>      } finally {
+>          System.out.println("此时在 finally 中 i = " + i);
+>          return ++i;
+>      }
+>  }
 > ```
 >
 > 调用以上方法,会返回 3 !
 >
 > ```java
->  public static int test() {
->         int i = 1;
->         try {
->             String w = null;
->             w.charAt(2);
->         } catch (NullPointerException e) {
->             System.out.println("此时在 NullPointerException 的 catch 中 i = " + i);
->             return ++i;
->         } finally {
->             System.out.println("此时在 finally 中 i = " + i);
->             ++i;
->             System.out.println("最终的 i 应该是 i =" + i);
->         }
->         return 100;
->     }
+> public static int test() {
+>      int i = 1;
+>      try {
+>          String w = null;
+>          w.charAt(2);
+>      } catch (NullPointerException e) {
+>          System.out.println("此时在 NullPointerException 的 catch 中 i = " + i);
+>          return ++i;
+>      } finally {
+>          System.out.println("此时在 finally 中 i = " + i);
+>          ++i;
+>          System.out.println("最终的 i 应该是 i =" + i);
+>      }
+>      return 100;
+>  }
 > ```
 >
-> 调用以上方法,会返回 2 ! 说明 finally 中的语块对之前的 return 处的值不造成影响了 !!!!  因为在 return语句处 , return 动作不能马上执行, 而 finally 中有没有 return语句 , i=2 是被临时变量 temp 保存的.
+> 调用以上方法,会返回 2 ! 说明 finally 中的语块对之前的 return 处的值不造成影响了 !!!!  因为在 return语句处 , return 动作不能马上执行, 而 finally 中有没有 return语句 , ==i=2 是被临时变量 temp 保存的.==
 
 > try-catch-finally 执行顺序小结
 >
@@ -229,22 +231,66 @@ try {
 
 > throws 注意事项和使用细节
 >
-> 1） 对于编译异常，程序中必须处理，比如 try-catch 或者 throws
-> 2） 对于运行时异常，程序中如果没有处理，默认就是throws的方式处理
+> 1） ==对于编译异常，程序中必须处理，比如 try-catch 或者 throws==
+> 2） ==对于运行时异常，程序中如果没有处理，默认就是throws的方式处理==
 > 3） 子类重写父类的方法时，对抛出异常的规定：子类重写的方法，所抛出的异常类型要么和父类抛出的异常一致，要么为父类抛出的异常的类型的子类型
 > 4） 在throws 过程中，如果有方法 try-catch，就相当于处理异常，就可以不必throws
 
 一定要区分好 运行时异常 和 编译异常 !
 
 ```java
-public static void f4() {
-//1. 在f4()中调用方法f5()是OK的
-//2. 原因是f5()抛出的是运行异常
-//3.而java中，并不要求程序员显示处理，因为有默认处理机制
-	f5();
+package com.hspedu.throws_;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+/**
+* @author 韩顺平
+* @version 1.0
+*/
+public class ThrowsDetail {
+  public static void main(String[] args) {
+    f2();
+  }
+  public static void f2() /*throws ArithmeticException*/ {
+    //1.对于编译异常，程序中必须处理，比如 try-catch 或者 throws
+    //2.对于运行时异常，程序中如果没有处理，默认就是 throws 的方式处理
+    int n1 = 10;
+    int n2 = 0;
+    double res = n1 / n2;
+  }
+  public static void f1() throws FileNotFoundException {
+    //这里大家思考问题 调用 f3() 报错
+    //老韩解读
+    //1. 因为 f3() 方法抛出的是一个编译异常
+    //2. 即这时，就要 f1() 必须处理这个编译异常
+    //3. 在 f1() 中，要么 try-catch-finally ,或者继续 throws 这个编译异常
+    f3(); // 抛出异常
+  }
+  public static void f3() throws FileNotFoundException {
+    FileInputStream fis = new FileInputStream("d://aa.txt");
+  }
+  public static void f4() {
+    //老韩解读:
+    //1. 在 f4()中调用方法 f5() 是 OK
+    //2. 原因是 f5() 抛出的是运行异常
+    //3. 而 java 中，并不要求程序员显示处理,因为有默认处理机制
+    f5();
+  }
+  public static void f5() throws ArithmeticException {
+  }
 }
-public static void f5() throws ArithmeticException {
-｝
+
+class Father { //父类
+  public void method() throws RuntimeException {
+  }
+}
+class Son extends Father {//子类
+  //3. 子类重写父类的方法时，对抛出异常的规定:子类重写的方法，
+  // 所抛出的异常类型要么和父类抛出的异常一致，要么为父类抛出的异常类型的子类型
+  //4. 在 throws 过程中，如果有方法 try-catch , 就相当于处理异常，就可以不必 throws
+  @Override
+  public void method() throws ArithmeticException {
+  }
+}
 ```
 
 # 自定义异常
@@ -252,8 +298,8 @@ public static void f5() throws ArithmeticException {
 > 自定义异常的步骤
 >
 > 1）定义类：自定义异常类名（程序员自己写）继承 Exception 或RuntimeException
-> 2）如果继承 Exception，属于编译异常
-> 3）如果继承RuntimeException，属于运行异常（一般来说，继承RuntimeException ）
+> 2）==如果继承 Exception，属于编译异常==
+> 3）==如果继承RuntimeException，属于运行异常（一般来说，继承RuntimeException ）==
 
 ```java
 public class CustomException {
@@ -274,7 +320,7 @@ class AgeException extends RuntimeException {
 }
   
   //1.一般情况下，我们自定义异常是继承 RuntimeException
-  //2. 即把自定义异常做成 运行时异常，好处时，我们可以使用默认的处理机制
+  //2. 即把自定义异常做成 运行时异常，好处是，我们可以使用默认的处理机制
 ```
 
 # throw 和 throws 的对比
