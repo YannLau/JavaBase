@@ -345,68 +345,71 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @author YannLau
- * @version 1.0
- * @program untitled
- * @ClassName Container
- * @ClassPath com.lyp.reflect.Container
- * @create 2024-04-29 15:23
- * @description
- */
+* @author YannLau
+* @version 1.0
+* @program untitled
+* @ClassName Container
+* @ClassPath com.lyp.reflect.Container
+* @create 2024-04-29 15:23
+* @description
+*/
 public class Container {
-    private Map<Class<?>, Method> methods;
-    private Object config;
-    private Map<Class<?>, Object> services;
+  private Map<Class<?>, Method> methods;
+  private Object config;
+  private Map<Class<?>, Object> services;
 
-    public Container() throws ClassNotFoundException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
-        this.init();
-    }
+  public Container() throws ClassNotFoundException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+      this.init();
+  }
 
-    public void init() throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
-        //初始化methods
-        this.methods = new HashMap<>();
-        this.services = new HashMap<>();
-        Class<?> clazz = Class.forName("com.lyp.reflect.Config");
-        Method[] methods = clazz.getDeclaredMethods();
-        for (Method method : methods) {
-            if (method.isAnnotationPresent(SelectedService.class)) {
-                //或者用 method.getDeclaredAnnotation(SelectedService.class) != null 去判断
-                //System.out.println(method.getName());
-                this.methods.put(method.getReturnType(), method);
-            }
-        }
-        this.config = clazz.getConstructor().newInstance();
-    }
+  public void init() throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+      //初始化methods
+      this.methods = new HashMap<>(); //methods用来存放创建服务实例的构造方法,其实实现的是懒加载
+      this.services = new HashMap<>();
+      Class<?> clazz = Class.forName("com.lyp.reflect.Config");
+      Method[] methods = clazz.getDeclaredMethods();
+      for (Method method : methods) {
+          if (method.isAnnotationPresent(SelectedService.class)) {
+              //或者用 method.getDeclaredAnnotation(SelectedService.class) != null 去判断
+              //System.out.println(method.getName());
+              this.methods.put(method.getReturnType(), method);
+          }
+      }
+    //构造配置文件对象,为了后面懒加载时进行方法反射
+      this.config = clazz.getConstructor().newInstance();
+  }
 
-    public Object getServiceInstanceByClass(Class<?> clazz) throws InvocationTargetException, IllegalAccessException {
-        if (services.containsKey(clazz)) {
-            return services.get(clazz);
-        } else if (this.methods.containsKey(clazz)) {
-            Method method = this.methods.get(clazz);
-            Object obj = method.invoke(this.config);
-            services.put(clazz, obj);
-            return obj;
-        }
-        return null;
-    }
+  public Object getServiceInstanceByClass(Class<?> clazz) throws InvocationTargetException, IllegalAccessException {
+      if (services.containsKey(clazz)) {
+          return services.get(clazz);
+      } else if (this.methods.containsKey(clazz)) { //服务实例懒加载
+          Method method = this.methods.get(clazz);
+          Object obj = method.invoke(this.config); //这里通过反射构造服务对象实例
+          services.put(clazz, obj);
+          return obj;
+      }
+      return null;
+  }
 
-    public Object createInstance(Class<?> clazz) throws InvocationTargetException, IllegalAccessException, InstantiationException, NoSuchMethodException {
-        Constructor<?>[] declaredConstructors = clazz.getDeclaredConstructors();
-        for(Constructor<?> constructor : declaredConstructors) {
-            if (constructor.isAnnotationPresent(SelectedConstructor.class)) {
-                //System.out.println(constructor);
-                Class<?>[] parameterTypes = constructor.getParameterTypes();
-                Object[] arguments = new Object[parameterTypes.length];
-                for (int i = 0; i < parameterTypes.length; i++) {
-                    arguments[i] = getServiceInstanceByClass(parameterTypes[i]);
-                }
-                //自动将服务注入到实例当中
-                return constructor.newInstance(arguments);
-            }
-        }
-        //如果没有任何构造器被注解
-        return clazz.getConstructor().newInstance();
-    }
+  public Object createInstance(Class<?> clazz) throws InvocationTargetException, IllegalAccessException, InstantiationException, NoSuchMethodException {
+      Constructor<?>[] declaredConstructors = clazz.getDeclaredConstructors();
+      //扫描所有的构造器
+      for(Constructor<?> constructor : declaredConstructors) {
+        	//如果构造器被标注了,说明要使用该构造器来构造对象
+          if (constructor.isAnnotationPresent(SelectedConstructor.class)) {
+              //System.out.println(constructor);
+              Class<?>[] parameterTypes = constructor.getParameterTypes();
+              Object[] arguments = new Object[parameterTypes.length];
+							//自动将服务注入到实例当中
+              for (int i = 0; i < parameterTypes.length; i++) {
+                  arguments[i] = getServiceInstanceByClass(parameterTypes[i]);
+              }
+              return constructor.newInstance(arguments);
+          }
+      }
+      //如果没有任何构造器被注解,使用无参数方法构造对象
+      return clazz.getConstructor().newInstance();
+  }
 }
 ```
 
@@ -476,7 +479,6 @@ public class Main {
                 method.invoke(fieldValue);
             }
         }
-
     }
 }
 ```

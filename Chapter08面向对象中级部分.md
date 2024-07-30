@@ -34,7 +34,7 @@ P264——P361
 |  18  |     打开setting      |                         command  + ,                         |                  |                                                              |
 |  19  |   control+shift+.    |                           字体放大                           |                  |                                                              |
 |  20  |   control+shift+,    |                           字体缩小                           |                  |                                                              |
-|      |                      |                                                              |                  |                                                              |
+|  21  |   command+option+B   |                 显示接口、类的实现类、继承类                 |    ctrl+Alt+B    |                                                              |
 |      |                      |                                                              |                  |                                                              |
 |      |                      |                                                              |                  |                                                              |
 |      |                      |                                                              |                  |                                                              |
@@ -421,7 +421,7 @@ if(persons［i］ instanceof Student)｛//判断person［i］ 的运行类型是
 >       String s2 = "123"；
 >       s1 == s2 // true
 >       s1.equals(s2); //true 
->                            
+>                               
 >       String s3 = new String("123");
 >       String s4 = new String("123");
 >       s3 == s4 // false
@@ -478,7 +478,7 @@ if(persons［i］ instanceof Student)｛//判断person［i］ 的运行类型是
 >        }
 >      }
 >      ```
->                     
+>                        
 >    5. 老韩提示：我们在实际开发中，几乎不会运用 finalize，所以更多就是为了应付面试。
 
 # Integer 和 ==
