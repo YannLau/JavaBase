@@ -2,16 +2,17 @@ P425——P443
 
 [toc]
 
-# 自定义枚举
-
 1）枚举对应英文（enumeration， 简写 enum）
 2）枚举是一组常量的集合。
-3） 可以这里理解：枚举属于一种特的类，里面只包含一组有限的特定的对象。
+3）可以这里理解：枚举属于一种特殊的类，里面只包含一组有限的特定的对象。
+4）只读，不需要修改。
 
 > 枚举的两种实现方式
 >
-> 1. 自定义类实现枚举
-> 2. 使用 enum 关键字实现枚举
+> 1. ==自定义类实现枚举==
+> 2. ==使用 enum 关键字实现枚举==
+
+# 自定义枚举
 
 > 自定义枚举实现
 >
@@ -19,31 +20,89 @@ P425——P443
 > 2. 去掉 setter 方法,防止被修改
 > 3. 在类内部直接创建固定的对象,作为 private 成员变量
 > 4. 优化,加上 final 关键字.
+> 5. 不需要提供setXxx 方法，因为枚举对象值通常为只读.
+> 6. 对枚举对象/属性使用 final + static 共同修饰，实现底层优化.
+> 7. 枚举对象名通常使用全部大写，常量的命名规范.
+> 8. 枚举对象根据需要，也可以有多个属性
 
-1. 不需要提供setXxx 方法，因为枚举对象值通常为只读.
-2. 对枚举对象/属性使用 final + static 共同修饰，实现底层优化.
-3. 枚举对象名通常使用全部大写，常量的命名规范.
-4. 枚举对象根据需要，也可以有多个属性
+```java
+/**
+* @author 韩顺平
+* @version 1.0
+*/
+public class Enumeration02 {
+  public static void main(String[] args) {
+    System.out.println(Season.AUTUMN);
+    System.out.println(Season.SPRING);
+  }
+}
+//演示字定义枚举实现
+class Season {//类
+  private String name;//枚举名
+  private String desc;//描述
+  //定义了四个对象, 固定. public static final Season SPRING = new Season("春天", "温暖");
+  public static final Season WINTER = new Season("冬天", "寒冷");
+  public static final Season AUTUMN = new Season("秋天", "凉爽");
+  public static final Season SUMMER = new Season("夏天", "炎热");
+  //1. 将构造器私有化,目的防止 直接 new
+  //2. 去掉 setXxx 方法, 防止属性被修改
+  //3. 在 Season 内部，直接创建固定的对象
+  //4. 优化，可以加入 final 修饰符
+  private Season(String name, String desc) {
+    this.name = name;
+    this.desc = desc;
+  }
+  public String getName() {
+    return name;
+  }
+  public String getDesc() {
+    return desc;
+  }
+  @Override
+  public String toString() {
+    return "Season{" +
+      "name='" + name + '\'' +
+      ", desc='" + desc + '\'' +
+      '}';
+  }
+}
+```
 
 > 小结
 >
 > 1）构造器私有化
 > 2） 本类内部创建一组对象［四个 春夏秋冬］
 > 3） 对外暴露对象（通过为对象添加public final static修饰符）
-> 4）可以提供get方法，但是不要提供 set
+> 4） 可以提供get方法，但是不要提供 set
 
 # enum 枚举
 
+使用 enum 来实现前面的枚举案例，看老师演示，主要体会和自定义类实现枚举不同的地方。Enumeration03.java 代码
+
 ```java
+//演示使用 enum 关键字来实现枚举类
 enum Season{
-		//enum 关键字实现枚举要求把常量对象写在枚举类的最前面
-    SPRING("春天","温暖"),SUMMER("夏天","炎热"),AUTUMN("秋天","凉爽"),WINTER("冬天","寒冷"),WHAT;  //常量名(实参列表)
-  
+  //如果使用了 enum 来实现枚举类
+  //1. 使用关键字 enum 替代 class
+  //2. public static final Season SPRING = new Season("春天", "温暖") 直接使用 SPRING("春天", "温暖")
+  //   解读 常量名(实参列表)
+  //3. 如果有多个常量(对象)， 使用 , 号间隔即可
+  //4. 如果使用 enum 来实现枚举，要求将定义常量对象，写在前面
+  //5. 如果我们使用的是无参构造器，创建常量对象，则可以省略 ()
+
+  //enum 关键字实现枚举要求把常量对象写在枚举类的最前面
+  SPRING("春天","温暖"),
+  SUMMER("夏天","炎热"),
+  AUTUMN("秋天","凉爽"),
+  WINTER("冬天","寒冷"),
+  WHAT;  
+  //常量名(实参列表)
+
   private String name;
   private String desc;
-  
+
   private Season(){ //无参构造器
-    
+
   }
   private Season(String name,String desc) {
     this.name = name;
@@ -60,11 +119,112 @@ enum Season{
 
 > enum 注意事项
 >
-> 1. 当我们使用 enum 关键字开发一个枚举类时，默认会继承Enum类(一个 final 类) , 可以用反编译工具 javap 证明 .
-> 2. 传统的 public static final Season2 SPRING = new Season2（"春天”，"温暖"）；简化成 SPRING（“春天”“温暖"），这里必须知道，它调用的是哪个构造器.
-> 3. 如果使用无参构造器 创建 枚举对象，则实参列表和小括号都可以省略 .  见上方代码 WHAT
-> 4. 当有多个枚举对象时，使用，间隔，最后有一个分号结尾
-> 5. 枚举对象必须放在枚举类的行首.
+> 1. 当我们使用 enum 关键字开发一个枚举类时，`默认会继承 Enum类 (一个 final 类)` , 可以用反编译工具 javap 证明.
+>
+> 2. 从父类的Enum类中会继承几个好用的方法：
+>
+>    `public final String name()`
+>
+>    `public static org.yannlau.Season valueOf(String name)`
+>
+>    `public static <T extends Enum<T>> T valueOf(Class<T> enumType,String name)`
+>
+>    `public static org.yannlau.Season[] values()`
+>
+>    `compareTo(E o)`
+>
+>    `ordinal()`：返回当前对象的位置号，默认从0开始
+>    
+>    ```java
+>    package org.yannlau;
+>    
+>    import java.util.Arrays;
+>    import java.util.List;
+>    import java.util.stream.Collectors;
+>    import java.util.stream.Stream;
+>    
+>    public enum Season {
+>      SPRING,
+>      SUMMER,
+>      AUTUMN,
+>      WINTER(4, "寒冷");
+>    
+>      private int value;
+>      private String description;
+>      private static final Season[] seasons = values();
+>    
+>      Season() {
+>      }
+>    
+>      Season(int value, String description) {
+>        this.value = value;
+>        this.description = description;
+>      }
+>    
+>      public int getValue() {
+>        return value;
+>      }
+>    
+>      public String getDescription() {
+>        return description;
+>      }
+>    
+>      public static void printAll() {
+>        //测试values()的返回值
+>        System.out.println("=========测试values()的返回值===========");
+>        Arrays.stream(seasons).forEach(System.out::println);
+>        System.out.println("&&&&&&&&&&&&&&");
+>        Stream<Season> stream = Arrays.stream(seasons);
+>        List<Season> collect = stream.collect(Collectors.toList());
+>        System.out.println(collect);
+>        System.out.println("=========测试name()的返回值========");
+>        String name = SPRING.name();
+>        System.out.println(name);
+>        System.out.println("=========测试valueOf(String)的返回值========");
+>        Season awd = Season.valueOf("AUTUMN");
+>        System.out.println(awd);
+>        System.out.println("========展示valueOf(Class<T> enumType,String name)的用法========");
+>        Season summer = Enum.valueOf(Season.class, "SUMMER");
+>        System.out.println(summer);
+>        System.out.println("========展示compareTo(E o)的用法========");
+>        int i = Season.SPRING.compareTo(Season.AUTUMN); //spring-order: 0  autumn-order:2   0 - 2 = -2
+>        System.out.println("compareTo()的结果为 -> " + i);
+>      }
+>    }
+>    
+>    printAll()的输出结果：
+>    
+>      =========测试values()的返回值===========
+>      SPRING
+>      SUMMER
+>      AUTUMN
+>      WINTER
+>      &&&&&&&&&&&&&&
+>      [SPRING, SUMMER, AUTUMN, WINTER]
+>      =========测试name()的返回值========
+>      SPRING
+>      =========测试valueOf(String)的返回值========
+>      AUTUMN
+>      ========展示valueOf(Class<T> enumType,String name)的用法========
+>      SUMMER
+>      ========展示compareTo(E o)的用法========
+>      compareTo()的结果为 -> -2
+>    ```
+>
+> 
+>
+> 3. 传统的 `public static final Season2 SPRING = new Season2（"春天”，"温暖"）`；简化成 `SPRING(“春天”,“温暖")`，这里必须知道，它调用的是哪个构造器.
+>
+> 4. 如果使用无参构造器 创建 枚举对象，则实参列表和小括号都可以省略 .  见上方代码 `WHAT`
+>
+> 5. `当有多个枚举对象时，使用，间隔，最后有一个分号结尾`
+>
+> 6. 枚举对象必须放在枚举类的行首.
+>
+> 7. 枚举类不能显式地继承类`'extends' not allowed on enum`，`但是可以实现接口`
+>
+> 8. `Modifier 'private' is redundant for enum constructors` 枚举类型的构造器的private关键字是多余的，可以省略
+>
 
 > 练习题
 >
@@ -79,6 +239,7 @@ enum Season{
 > enum Season{
 >   SPRING,SUMMER
 > }
+> 
 > //反编译结果
 > public final class Season extends java.lang.Enum<Season> {
 >   public static final Season SPRING;
@@ -89,7 +250,7 @@ enum Season{
 > }
 > ```
 >
-> 1）上面语法是ok的
+> 1） 上面语法是ok的
 > 2） 有一个枚举类Gender，没有属性。
 > 3） 有两个枚举对象 BOY,GIRL，使用的无参构造器创建.
 
@@ -99,7 +260,7 @@ enum Season{
 
 `Gender boy2 = Gender.BOY;`
 
-boy1 == boy2  // true!  因为枚举类型的对象是静态对象!
+boy1 == boy2  // true!  `因为枚举类型的对象是静态对象!`
 
 # Enum 类中的方法
 
@@ -172,7 +333,7 @@ for (Season value : Season.values()) {  //增强for 循环打印 values 枚举�
 > 2. 如果不写@Override 注解，而父类仍有 `public void fly(){}`，仍然构成重写
 > 3. @override 只能修饰方法，不能修饰其它类，包，属性等等
 > 4. 查看@Override注解源码为 @Target(ElementType.METHOD) , 说明只能修饰
->   方法
+>     方法
 > 5. @Target 是修饰注解的注解，称为元注解
 
 # @Deprecated
@@ -184,7 +345,7 @@ for (Season value : Season.values()) {  //增强for 循环打印 values 枚举�
 > 1. 用于表示某个程序元素（类，方法等）已过时
 > 2. 可以修饰方法，类，字段，包，参数 等等
 > 3. @Target(value={CONSTRUCTOR, FIELD, LOCAL_VARIABLE, METHOD,
->   PACKAGE, PARAMETER, TYPE))
+>     PACKAGE, PARAMETER, TYPE))
 > 4. @Deprecated 的作用可以做到新旧版本的兼容和过渡
 
 # @SuppressWarnings
@@ -192,11 +353,12 @@ for (Season value : Season.values()) {  //增强for 循环打印 values 枚举�
 1. 当我们不希望看到这些警告的时候，可以使用 SuppressWarnings注解来抑制警告信息
 2. 在`{" "}`中，可以写入你希望抑制（不显示）警告信息 , 如`@SuppressWarnings({"boxing","cast"})`
 3. 可以指定的警告类型有
-  all : 抑制所有警告 etc
+    all : 抑制所有警告 etc
 4. 关于SuppressWarnings 作用范围是和你放置的位置相关
 5. SuppressWarnings 源码查看
   1. 放置的位置就是 TYPE,FIELD,METHOD,PARAMETER, CONSTRUCTOR,LOCAL_VARIABLE
   2. 该注解类有数组
+
     `String[] values()` 设置一个数组比如 `{"rawtypes", "unchecked", "unused"}`
 
 > ＞说明各种值

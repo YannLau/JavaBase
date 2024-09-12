@@ -1,4 +1,4 @@
-P460---P
+P460---P498
 
 [toc]
 
@@ -121,7 +121,7 @@ public void method10 {
 
 //valueOf 源码
 public static Integer valueof(int i) {
-if (i >= IntegerCache. low (-128) && i <= IntegerCache.high (127) )
+if (i >= IntegerCache.low (-128) && i <= IntegerCache.high (127) )
 	return IntegerCache.cache[i + (-IntegerCache.low)];
 return new Integer(i);
 ｝
@@ -191,7 +191,7 @@ return new Integer(i);
 > 2. 字符串是不可变的。一个字符串对象一旦被分配，其内容是不可变的
 >
 >    ```java
->   String s1 = "hello";
+>     String s1 = "hello";
 >    s1="haha"; 
 >    //创建了2个对象
 >    ```
@@ -209,7 +209,7 @@ return new Integer(i);
 >    2. String a = "hello"+"abc";  =》 String a = "helloabc"；
 >
 > 4. String a = "hello"： //创建 a对象
->   String b ="abc"：//创建 b对象
+>     String b ="abc"：//创建 b对象
 >    String c = a+b；创建了几个对象？3个 画出内存图？
 > 
 >    1. 先 创建一个 StringBuilder sb = new StringBuilder();
