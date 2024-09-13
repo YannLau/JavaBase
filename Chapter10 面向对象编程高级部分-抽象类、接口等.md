@@ -266,30 +266,50 @@ P374——P424
 
 # 抽象类abstract
 
-父类方法的不确定性 ==> 考虑将该方法设计为抽象(abstract)方法。所谓抽象的方法就是指没有实现没有方法体的方法！当一个类中存在抽象方法时，需要将类声明为抽象类！给类定义增加 abstract 关键字。并让子类实现该方法（且必须要实现，除非子类也设为 abstract）
+父类方法的不确定性 ==> 考虑将该方法设计为抽象(abstract)方法。
+
+所谓抽象的方法就是指没有实现没有方法体的方法！
+
+当一个类中存在抽象方法时，需要将类声明为抽象类！
+
+给类定义增加 abstract 关键字，并让子类实现该方法（且必须要实现，除非子类也设为 abstract）。
 
 > 语法: 
 >
 > ```java
-> public abstract class Animal{
-> 
-> 	public abstract void eat(); //不写方法体
-> 	public void getWeight(){
-> 		...
-> 	}
+> package com.hspedu.abstract_;
+> public class Abstract01 {
+>   public static void main(String[] args) {
+>   }
+> }
+> abstract class Animal {
+>   private String name;
+>   public Animal(String name) {
+>     this.name = name;
+>   }
+>   //思考：这里 eat 这里你实现了，其实没有什么意义
+>   //即： 父类方法不确定性的问题
+>   //===> 考虑将该方法设计为抽象(abstract)方法
+>   //===> 所谓抽象方法就是没有实现的方法
+>   //===> 所谓没有实现就是指，没有方法体
+>   //===> 当一个类中存在抽象方法时，需要将该类声明为 abstract 类
+>   //===> 一般来说，抽象类会被继承，有其子类来实现抽象方法. // public void eat() {
+>   // System.out.println("这是一个动物，但是不知道吃什么..");
+>   // }
+>   public abstract void eat() ;
 > }
 > ```
 
 小结：
+
 当父类的某些方法，需要声明，但是又不确定如何实现时，可以将其声明为抽象方法，那么这个类就是抽象类。
 
 > 介绍
 >
-> 1） 用abstract 关键字来修饰一个类时，这个类就叫抽象类
-> 访问修饰符 abstract类名｛ ｝
+> 1） 用abstract 关键字来修饰一个类时，这个类就叫抽象类`访问修饰符 abstract类名｛ ｝`
 > 2） 用abstract关键字来修饰一个方法时，这个方法就是抽象方法 —— 访问修饰符 abstract 返回类型 方法名（参数列表）：//没有方法体
 > 3） 抽象类的价值更多作用是在于设计，是设计者设计好后，让子类继承并实现抽象类()
-> 4）抽象类，是考官比较爱问的知识点，在框架和设计模式使用较多。
+> 4） ==抽象类，是考官比较爱问的知识点，在框架和设计模式使用较多==。
 
 > 抽象类细节
 >
@@ -301,16 +321,20 @@ P374——P424
 >
 > 4. abstract 只能修饰类和方法，不能修饰属性和其它的 
 >
-> 5. 抽象类可以有任意成员【抽象类还是类】，比如：非抽象方法、构造器、静态属性等等
+> 5. 抽象类可以有任意成员【抽象类还是类】，比如：非抽象方法(实例方法)、构造器、静态属性等等
 >
-> 6. 抽象方法不能有主体，即不能实现implement
+> 6. 抽象方法不能有主体，即不能当场直接实现implement
+>
+>    ![QQ_1726144165805](/Users/yannlau/Documents/JavaSet/Java韩顺平/第1阶段_Java900P_韩顺平 + 个人理解积累补充/assets/QQ_1726144165805.png)
 >
 > 7. 如果一个类继承了抽象类，则它必须实现抽象类的所有抽象方法，除非它自己也声明为abstract类。那如果抽象父类只是声明为抽象类但不包含任何抽象方法的话，也就不用实现了。
-> 8. 抽象方法不能使用private、final 和 static来修饰，因为这些关键字都是和重写相违背的。
+>
+> 8. `抽象方法不能使用private、final 和 static来修饰`，因为这些关键字都是和重写相违背的。
 
 > 为什么抽象方法不能用 private 关键字修饰？
 >
 > ChatGPT
+>
 > 在Java中，抽象方法是声明在抽象类或接口中的方法，而抽象方法的目的是为了让派生类（子类）提供具体的实现。抽象方法是一种约定，它告诉子类必须提供对应的实现。
 >
 > 使用`private`关键字修饰抽象方法是不合法的，原因如下：
@@ -322,7 +346,7 @@ P374——P424
 
 > 有 静态抽象方法 一说吗？
 >
-> 在Java中，抽象方法是一种声明在抽象类或接口中的方法，而静态方法是与类相关联而不是与对象相关联的。在Java 8及之前的版本中，抽象方法不能是静态的。然而，从Java 8开始，接口中可以包含静态方法。
+> 在Java中，`抽象方法 是一种声明在 抽象类 或 接口 中的方法`，而静态方法是与类相关联而不是与对象相关联的。在Java 8及之前的版本中，抽象方法不能是静态的。然而，从Java 8开始，接口中可以包含静态方法。
 >
 > 具体来说，Java 8引入了接口的默认方法和静态方法。接口中的静态方法可以提供一些通用的功能，而不需要实现类去实现这些方法。这使得在接口中引入新方法时更加灵活，而不会破坏已有的实现类。
 >
@@ -330,37 +354,97 @@ P374——P424
 >
 > ```java
 > interface MyInterface {
->     void abstractMethod(); // 抽象方法
+>  void abstractMethod(); // 抽象方法
 > 
->     static void staticMethod() {
->         System.out.println("Static method in interface");
->     }
+>  static void staticMethod() {
+>      System.out.println("Static method in interface");
+>  }
 > }
 > 
 > class MyClass implements MyInterface {
->     @Override
->     public void abstractMethod() {
->         System.out.println("Implementation of abstract method");
->     }
+>  @Override
+>  public void abstractMethod() {
+>      System.out.println("Implementation of abstract method");
+>  }
 > }
 > 
 > public class Main {
->     public static void main(String[] args) {
->         MyInterface.staticMethod(); // 调用接口中的静态方法
+>  public static void main(String[] args) {
+>      MyInterface.staticMethod(); // 调用接口中的静态方法
 > 
->         MyClass myClass = new MyClass();
->         myClass.abstractMethod();    // 调用实现类中的抽象方法
->     }
+>      MyClass myClass = new MyClass();
+>      myClass.abstractMethod();    // 调用实现类中的抽象方法
+>  }
 > }
 > ```
 >
 > 在上述示例中，`MyInterface`接口包含一个抽象方法`abstractMethod`和一个静态方法`staticMethod`。实现类`MyClass`需要提供对抽象方法的具体实现，但不需要实现静态方法。静态方法可以直接通过接口名调用，而不需要创建接口的实例。
+>
+> java静态方法可以进行重写吗？
+>
+> ChatGPT
+>
+> Java 中 **静态方法不能被重写**，只能被**隐藏**。这是因为静态方法属于类本身，而不是某个具体对象的实例。重写（Override）是针对实例方法的，它依赖于运行时的动态绑定（即多态），而静态方法在编译时就已经绑定到类上了，因此不能参与运行时的动态分派。
+>
+> ### 静态方法的隐藏（Hiding）
+>
+> 虽然静态方法不能被重写，但可以在子类中声明一个与父类相同签名的静态方法，这样父类的静态方法在子类中就会被**隐藏**。这种情况下，调用的是声明该方法的类的版本，而不是父类的版本。
+>
+> ### 示例
+>
+> ```java
+> class Parent {
+>     static void staticMethod() {
+>       System.out.println("Parent static method");
+>     }
+> 
+>     void instanceMethod() {
+>       System.out.println("Parent instance method");
+>     }
+>   }
+> class Child extends Parent {
+>   static void staticMethod() {
+>     System.out.println("Child static method");
+>   }
+>   @Override
+>   void instanceMethod() {
+>     System.out.println("Child instance method");
+>   }
+> }
+> public class Test {
+>   public static void main(String[] args) {
+>     Parent p = new Child();
+> 
+>     // 静态方法绑定到类，不依赖实例，表现为"隐藏"
+>     p.staticMethod(); // 输出: Parent static method
+> 
+>     // 实例方法会被重写，依赖于运行时的实际对象
+>     p.instanceMethod(); // 输出: Child instance method
+>   }
+> }
+> ```
+>
+> ### 解释：
+>
+> - `p.staticMethod()` 调用了父类的静态方法，因为静态方法是**编译时**绑定的，它与对象的实际类型无关，而是根据引用的类型决定，因此调用的是 `Parent` 类的 `staticMethod`。
+> - `p.instanceMethod()` 调用了子类的实例方法，这是**运行时**绑定的，依赖于 `p` 引用的实际对象类型（即 `Child`），因此调用了子类的 `instanceMethod`。
+>
+> ### 总结：
+>
+> - **静态方法不能被重写，只能被隐藏**。
+> - 调用静态方法时，根据引用的**编译时类型**来决定调用哪一个版本，而实例方法则是根据对象的**运行时类型**决定。
 
 # 抽象类的实践——模板设计模式
 
+抽象类体现的就是一种模板模式的设计，抽象类作为多个子类的通用模板，子类在抽象类的基础上进行扩展、改造，但子类总体上会保留抽象类的行为方式。
+
+1）`当功能内部一部分实现是确定，一部分实现是不确定的。这时可以把不确定的部分暴露出去，让子类去实现。`
+
+2）编写一个抽象父类，父类提供了多个子类的通用方法，并把一个或多个方法留给其子类实现，就是一种模板模式.
+
 > 需求
 >
-> 1）有多个类，完成不同的任务job
+> 1） 有多个类，完成不同的任务job
 > 2） 要求能够得到各自完成任务的时间
 > 3） 请编程实现
 >
@@ -368,12 +452,12 @@ P374——P424
 >
 > 2. 分析问题，提出使用模板设计模式
 
-`long end = System.currentTimeMills();`得到当前的时间戳！
+`long end = System.currentTimeMills(); `得到当前的时间戳！
 
 设计一个抽象类（Template），能完成如下功能：
-1） 编写方法calculateTimeO，可以计算某段代码的耗时时间
-2） 编写抽象方法job0
-3）编写一个子类Sub，继承抽象类Template，并实现job方法。
+1） 编写方法`calculateTime()`，可以计算某段代码的耗时时间
+2） 编写抽象方法job()
+3） 编写一个子类Sub，继承抽象类Template，并实现job方法。
 4） 编写一个测试类TestTemplate，看看是否好用。
 
 ```java
@@ -384,7 +468,7 @@ abstract class Template{//抽象类
 		public void caleTimes(){// 统计耗时多久是确定
 			//统计当前时间距离 1970-1-1 0:0:0的时间差，单位ms
 			long start = System.currentTimeMillis;
-			job();  //动态绑定机制
+			this.job();  //动态绑定机制
 			long end = System.currentTimeMillis;
 			System.out.printin("耗时: "+(end-start));
 		}
@@ -394,6 +478,58 @@ abstract class Template{//抽象类
 会涉及多态的动态绑定机制！
 
 # 接口 interface
+
+```java
+package com.hspedu.interface_;
+public interface UsbInterface { //接口
+  //规定接口的相关方法,老师规定的.即规范... public void start();
+  public void stop();
+}
+
+package com.hspedu.interface_;
+public class Camera implements UsbInterface{//实现接口,就是把接口方法实现
+  @Override
+  public void start() {
+    System.out.println("相机开始工作...");
+  }
+  @Override
+  public void stop() {
+    System.out.println("相机停止工作....");
+  }
+}
+
+package com.hspedu.interface_;
+//Phone 类 实现 UsbInterface
+//解读 1. 即 Phone 类需要实现 UsbInterface 接口 规定/声明的方法
+public class Phone implements UsbInterface {
+  @Override
+  public void start() {
+    System.out.println("手机开始工作...");
+  }
+  @Override
+  public void stop() {
+    System.out.println("手机停止工作.....");
+  }
+}
+
+package com.hspedu.interface_;
+public class Interface01 {
+  public static void main(String[] args) {
+    //创建手机，相机对象
+    //Camera 实现了 UsbInterface
+    Camera camera = new Camera();
+    //Phone 实现了 UsbInterface
+    Phone phone = new Phone();
+    //创建计算机
+    Computer computer = new Computer();
+    computer.work(phone);//把手机接入到计算机
+    System.out.println("===============");
+    computer.work(camera);//把相机接入到计算机
+  }
+}
+```
+
+### 基本介绍
 
 > 接口就是给出一些没有实现的方法，封装到一起，到某个类要使用的时候，在根据具体情况把这些方法写出来。语法：
 >
@@ -405,7 +541,7 @@ abstract class Template{//抽象类
 >
 > `}`
 >
-> `class 类名 implements 接口1,接口2,接口3{`
+> `class 类名 implements 接口1,接口2,接口3 {`
 >
 > ​	`//自己属性`
 >
@@ -415,9 +551,13 @@ abstract class Template{//抽象类
 >
 > `}`
 >
+> 小结；接口是更加抽象的抽象的类，抽象类里的方法可以有方法体，接口里的所有方法都没有方法体【jdk7.0】。接口体现了程序设计的多态和高内聚低偶合的设计思想。
+>
+> 特别说明：Jdk8.0后接口类可以有静态方法，默认方法(实例方法加上default关键字)，也就是说接口中可以有方法的具体实现。但是不可以有专门的实例方法。
+>
 > 小结：
 >
-> 1. 在Jdk7.0前 接口里的所有方法都没有方法体。即都是抽象的方法（一般不写 abstract 关键字）。在接口中，抽象方法，可以省略 abstract 关键字。
+> 1. `在Jdk7.0前 接口里的所有方法都没有方法体。即 都是抽象的方法`（一般不写 abstract 关键字）。`在接口中，抽象方法，可以省略 abstract 关键字。`
 > 2. Jdk8.0后接口类可以有静态方法，默认方法（default 修饰——default 放在访问修饰符前面），也就是说接口中可以有方法的具体实现。
 
 > 接口的深入讨论
@@ -432,14 +572,25 @@ abstract class Template{//抽象类
 > 接口的注意事项和细节
 >
 > 1）接口不能被实例化
-> 2）接口中所有的方法是 public方法，不写访问修饰符也是默认为 public，接口中抽象方法，可以不用abstract 修饰 `public void aaa();  等价于    public abstract void aaa();`不用加花括号！
+> 2）==接口中所有的方法是 public方法，不写访问修饰符也是默认为 public==，接口中抽象方法，可以省略 abstract 修饰 
+>
+> `public void aaa();  等价于    public abstract void aaa(); 等价于 void aaa() `  不用加花括号！
+>
 > 3） 一个普通类实现接口，就必须将该接口的所有方法都实现。
+>
 > 4） 抽象类实现接口，可以不用实现接口的方法。
+>
 > 5） 一个类同时可以实现多个接口
+>
 > 6）接口中的属性，只能是final的，而且是 public static final 修饰符。比如：int a=1；实际上是 `public static final` int a=1;（必须初始化）
+>
 > 7） 接口中属性的访问形式：`接口名.属性名`
-> 8） 一个接口不能继承其它的类，但是可以继承多个别的接口 `interface A extends B,C {}`
-> 9)接口的修饰符 只能是 public 和 默认，这点和类的修饰符是一样的。
+>
+> 8） ==一个接口不能继承其它的类，但是可以继承多个别的接口== `interface A extends B,C {}`
+>
+> 9） 接口的修饰符 只能是 public 和 默认 ，这点和类的修饰符是一样的。
+>
+> 10） ==Java 中类是单继承的，而接口可以多继承 **这意味着：**类只能继承一个类：在 Java 中，类的继承是单继承，即一个类只能继承另一个类。不能同时继承多个类。
 
 # 接口 VS 继承类
 
@@ -475,4 +626,5 @@ abstract class Template{//抽象类
 > 1. 接口类型的变量可以指向，实现了该接口的类的对象实例
 > 2. 如果A接口继承了另一个B 接口。而类 C 实现了 A 接口，就相当于类 C也实现了 B 接口，那么，B 接口引用变量可以用来指向 类C 的实例对象。这就是接口的多态传递现象！
 
-当一个对象访问一个父类和实现的接口都有的变量时，用 super.变量名指定父类变量，用 接口名.变量名指代接口变量，避免混淆，否则编译器会报错！
+当一个对象访问 一个父类 和 实现的接口 都有的变量时，用 super.变量名指定父类变量，用 接口名.变量名指代接口变量，避免混淆，否则编译器会报错！
+

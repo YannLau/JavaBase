@@ -29,6 +29,7 @@ P554---P568
 > 3） 不再提示编译警告
 
 > 老韩理解：泛（广泛）型（类型）=> Integer, String, Dog
+>
 > 1）泛型又称参数化类型，是Jdk5.0 出现的新特性，解决数据类型的安全性问题
 > 2） 在类声明或实例化时只要指定好需要的具体的类型即可。
 > 3） Java泛型<u>***可以保证如果程序在编译时没有发出警告***</u>，运行时就不会产生ClassCastException异常。同时，代码更加简洁、健壮 .
@@ -41,11 +42,13 @@ P554---P568
 > - 泛型的声明
 >   `interface 接口<T>{}`和 `class 类<K,V>{}`
 >   //比如：List,ArrayList
+>   
 >   - 说明：
->     1）其中，T,K,V不代表值，而是表示类型。可以理解为时类型变量。
+>     1）其中，T,K,V 不代表值，而是表示类型。可以理解为时类型变量。
 >     2）任意字母都可以。常用T表示，是Type的缩写
->
+>   
 > - 泛型的实例化：
+>   
 >   要在类名后面指定类型参数的值（类型）。如：
 >
 > 1) List<String > strList = new ArrayList<String>();
@@ -55,7 +58,7 @@ P554---P568
 >
 > 1. interface List<T>{  } , public class HashSet<E>{  }.. 等等说明: T, E只能是==引用类型==看看下面语句是否确?
 >     List<Integer> list = new ArrayList<Integer>();
->     List<int> list2 = new ArrayList<int>();
+>     List<int> list2 = new ArrayList<int>(); 错误
 >     
 > 2. 在指定泛型具体类型后，可以传入该类型或者其子类类型
 >
@@ -81,9 +84,9 @@ P554---P568
 > >
 > >1. <u>***普通成员***</u>可以使用泛型 (属性、方法)
 > >2. <u>***使用泛型的数组，不能初始化***</u>   T[] ts = new T[8];不被允许,因为数组在new时不能确定T的类型,就无法在内存中开空间。 ==我对这里持怀疑态度，我感觉应该是类型擦除，导致最终创造的是Object[]数组，然后不能保证添加到数组中的元素的类型，因此不允许。==
-> >3. <u>***静态方法(静态属性也不行)中不能使用类的泛型***</u> ,(因为静态方法是和类相关的,在类加载时,对象还没创建,  而泛型是在类创建对象定义的时候才会指定的,如果静态方法涉及泛型,JVM无法处理无法完成初始化)
+> >3. <u>***静态方法(静态属性也不行)中不能使用类的泛型***</u> ,(因为静态方法是和类相关的,在类加载时,对象还没创建, 而泛型是在类创建对象定义的时候才会指定的,如果静态方法涉及泛型,JVM无法处理无法完成初始化)
 > >4. 泛型类的类型，是在创建对象时确定的 (因为创建对象时,需要指定确定类型)
-> >5. 如果在创建对象时，没有指定类型，默认为Object
+> >5. 如果在创建对象时，没有指定类型，默认为Object。
 >
 > 解读:
 >
@@ -129,9 +132,9 @@ P554---P568
 > - YannLau补充 甚至 ArrayList <Object> list = new ArrayList <String>() 也不对。
 >   
 >   ```java
->           List<String> list = new ArrayList<>(); // Yes!!
->           List<Object> list1 = new ArrayList<String>(); //Error!!!
->           List<String> list2 = new ArrayList<String>(); //Yes!!
+>   List<String> list = new ArrayList<>(); // Yes!!
+>   List<Object> list1 = new ArrayList<String>(); //Error!!!
+>   List<String> list2 = new ArrayList<String>(); //Yes!!
 >   ```
 >   
 > - （YannLau说明，下面这一部分是很难完全理解的，韩老师讲解一笔带过，看我的第2部分）
@@ -141,6 +144,10 @@ P554---P568
 > - <? extends A>：支持A类以及A类的子类，规定了泛型的上限
 >
 > - <？ super A>：支持A类以及A类的父类，不限于直接父类，规定了泛型的下限
+
+
+
+
 
 # JUnit
 
@@ -178,7 +185,7 @@ Required type:
 capture of ? extends List<String>
 
 Provided:
-ArrayList  <java.lang.String>
+ArrayList<java.lang.String>
 */
 
 
@@ -194,4 +201,30 @@ list1.add(new ArrayList<String>());
 //ChatGPT
 //是的，你之前提供的代码是不符合通配符的使用规范的。在你的代码中，使用了 ArrayList<? extends List<String>> 这样的通配符，但是却试图向其添加具体的元素，这是不允许的。因为通配符 <? extends List<String>> 表示一个未知的类型，编译器无法确定具体是哪种类型，因此不允许直接添加元素。
 //如果你希望创建一个可以添加 ArrayList<String> 元素的列表，你可以考虑使用 List<List<String>> 类型，或者如果需要更加精确的类型约束，你可以使用带有通配符的上界 <? extends List<String>>。不过，需要注意的是，使用带有通配符的类型会使得一些操作受到限制，因此在选择使用时需要根据具体情况进行权衡和考虑。
+这里chatGPT说的也不对，见下面我的写法
 ```
+
+```java
+//经过深入理解，我把这里的代码改为正确的写法了
+
+public class test {
+    public static void main(String[] args) {
+        List<String> list = new ArrayList<>();
+        List<? super ArrayList<String>> list1 = new ArrayList<ArrayList<String>>(); //这里编译器不提示错误!!!
+
+        ArrayList<String> test = new ArrayList<>();
+        test.add("Fuck!!!");
+        test.add("Suck!!!");
+        ArrayList<String> test1 = new ArrayList<>();
+        test1.add("momo");
+        test1.add("kmj");
+        list1.add(test);
+        list1.add(test1);
+        System.out.println(list1);
+    }
+}
+
+//output
+[[Fuck!!!, Suck!!!], [momo, kmj]]
+```
+

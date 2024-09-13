@@ -14,6 +14,12 @@ Java核心技术卷I 12ed 第八章泛型程序设计
 
 - 概念补充
 
+  类型变量：T K 擦除后为 Object
+
+  类型变量限定 `<T extends Comparable>` `<K super List>` 擦除后为 Comparable List
+
+  无限定通配符 `<?> `通配符不是类型变量，因此，不能在编写代码中使用“？”作为一种类型。 `? element; 非法`
+
 >`<T,E,..>`中的T、E 应该被称为类型参数。
 >
 >泛型类型(<T,E,..>) 和 通配符类型(<?/T extends/super xxx>) 是两个不同的概念。
@@ -38,11 +44,11 @@ Java核心技术卷I 12ed 第八章泛型程序设计
 >
 > ArrayList<List<String>> list1 = new ArrayList<ArrayList<String>>(); // 也是非法，泛型不具备继承性
 >
-> List<? extends List<String>> list1 = new ArrayList<ArrayList<String>>();是合法的
+> List<? extends List<String>> list1 = new ArrayList<ArrayList<String>>(); //是合法的,但是没法使用
 >
-> 当然 ArrayList<? extends List<String>> list1 = new ArrayList<ArrayList<String>>();更是合法的
+> 当然 ArrayList<? extends List<String>> list1 = new ArrayList<ArrayList<String>>(); //更是合法的，但是也没法使用
 >
-> 这里我想说的是，？通配符在是在变相实现泛型继承性的同时，还能允许原本类之间的继承性，List <- ArrayList
+> 这里我想说的是，？通配符是在变相实现泛型继承性的同时，还能允许原本类之间的继承性，List <- ArrayList
 >
 > 但是其实是有限制的，这个限制正是我在 泛型1 中的结尾所写的我个人的迷思。
 >
@@ -63,7 +69,7 @@ Java核心技术卷I 12ed 第八章泛型程序设计
 >
 > 对于有多个限定类型的(T extends AA&BB&CC&..)，首先，类要写在接口前面。其次，会用第一个进行替换。如果都是接口，就无所谓顺序。
 >
-> 你可能想知道，`class Interval<T extends Comparator & Serializable>`限定切换为`class Interval<T extends Serializable & Comparator>`会发生什么。如果这样做，原始类型会用Serializable替换T，而且编译器会在必要时插入转换为Comparator的强制类型转换。为了提高效率应该将标记(tagging)接口（即没有方法的接口）放在限定列表的末尾。
+> 你可能想知道，`class Interval<T extends Comparator & Serializable>`限定切换为`class Interval<T extends Serializable & Comparator>`会发生什么。如果这样做，原始类型会用Serializable替换T，而且编译器会在必要时插入转换为Comparator的强制类型转换。==为了提高效率应该将标记(tagging)接口（即没有方法的接口）放在限定列表的末尾。==
 >
 > - 转换泛型表达式
 >
@@ -71,7 +77,9 @@ Java核心技术卷I 12ed 第八章泛型程序设计
 >
 > - 转换泛型方法
 >
-> 通过桥方法实现多态。
+> `(类型擦除会导致Override的一些方法变得不再是同一个方法，影响多态的调用) 可以通过桥方法实现多态。桥方法实现真正意义上的@Override！(桥方法是定义在子类中的，实现对父泛型类类型擦除后的方法进行重写，从而调用本类中正确的方法，实现多态)`
+>
+> <img src="/Users/yannlau/Documents/JavaSet/Java韩顺平/第1阶段_Java900P_韩顺平 + 个人理解积累补充/assets/QQ_1726207830105.png" alt="QQ_1726207830105" style="zoom:50%;" />
 
 # 限制与局限性
 
@@ -80,8 +88,11 @@ Java核心技术卷I 12ed 第八章泛型程序设计
 3. 不能创建参数化类型的数组。`var table = new Pair<String>[10]; Error!!! `但是可以声明
 4. 不能实例化类型变量 `T t = new T(); Error!`
 5. 不能构造泛型数组 `new T[10]; Error!`
-6. 泛型类的静态上下文中类型变量无效
-7. 
+6. 泛型类的静态上下文中类型变量无效，不能在静态字段或方法中引用类型变量。应该把静态方法做成泛型方法。
+7. Varargs警告
+   <img src="/Users/yannlau/Documents/JavaSet/Java韩顺平/第1阶段_Java900P_韩顺平 + 个人理解积累补充/assets/QQ_1726208085750.png" alt="QQ_1726208085750" style="zoom:50%;" />
+8. 既不能抛出也不能捕获泛型类的对象。实际上，泛型类扩展Throwable 甚至都是不合法的。
+9. 注意擦除后的冲突
 
 
 
@@ -91,25 +102,84 @@ Java核心技术卷I 12ed 第八章泛型程序设计
 
 <img src="/Users/yannlau/Documents/JavaSet/Java韩顺平/第1阶段_Java900P_韩顺平 + 个人理解积累补充/assets/image-20240429上午100859006.png" alt="image-20240429上午100859006" style="zoom: 50%;" />
 
-```json
-    public void test() {
+```java
+public void test() {
 
-        List<Integer> list1 = new ArrayList<>();
-        List list2 = list1;
-        list1.add(1); // 此时 list=[1]
-        list2.add("Hello"); //此时 list=[1,"Hello"]
-        //list1.add("World"); Error 不能通过编译器检查
-        System.out.println(list1.get(1)); // 我用使用了泛型的引用去取出 原始类型加入的"Hello",可以打印出 Hello
-        System.out.println(list2.get(0));  // 同样可以打印出 1
+  List<Integer> list1 = new ArrayList<>();
 
-        Object s = list1.get(1); //一切正常
-        System.out.println(s.getClass()); //一切正常 打印出 String类型
+  List list2 = list1; //raw List 指向 List<Integer>
 
-        System.out.println(list1.get(1).getClass()); // Error!!! 发生运行时的类强转异常
-        // class java.lang.String cannot be cast to class java.lang.Integer
-        // 应该是泛型对类型进行了强转,但是为什么取出来的时候没有发生强转异常的呢?
-        System.out.println(list2.get(0).getClass()); // 没有异常,得到 class java.lang.Integer
-    }
+  list1.add(1); // 此时 list=[1]
+
+  list2.add("Hello"); //此时 list=[1,"Hello"]
+
+  //list1.add("World"); Error 不能通过编译器检查
+  System.out.println(list1.get(1)); // 我用使用了泛型的引用去取出 原始类型加入的"Hello",可以打印出 Hello
+  System.out.println(list2.get(0));  // 同样可以打印出 1
+
+  Object s = list1.get(1); //一切正常
+  System.out.println(s.getClass()); //一切正常 打印出 String类型
+
+  System.out.println(list1.get(1).getClass()); // Error!!! 发生运行时的类强转异常
+  // class java.lang.String cannot be cast to class java.lang.Integer
+  // 应该是泛型对类型进行了强转,但是为什么取出来的时候没有发生强转异常的呢?
+  System.out.println(list2.get(0).getClass()); // 没有异常,得到 class java.lang.Integer
+}
+
+
+在这个代码示例中，你的 list1 使用了泛型 List<Integer>，而 list2 是一个原始类型的 List，这引起了一些有趣的运行时行为。让我们逐步解释为什么会出现这个运行时异常。
+  
+代码分析
+泛型擦除和原始类型：
+当你创建了 List<Integer> list1 时，编译器在编译时知道 list1 是一个包含 Integer 类型的列表。
+但是你将 list1 赋值给 List list2，也就是一个原始类型（raw type）列表。在 Java 中，泛型是通过擦除机制来实现的，即在运行时，泛型的类型信息不会保留，编译器会将泛型的类型擦除。因此，在运行时，list1 和 list2 其实是同一个对象，但它们在编译时有不同的类型约束。
+
+添加元素：
+
+java
+复制代码
+list1.add(1); // 通过 list1 向列表中添加了一个 Integer 1
+list2.add("Hello"); // 通过 list2 向同一个列表中添加了一个 String "Hello"
+list1 和 list2 是同一个对象，所以操作一个列表时，另一个也会受到影响。在运行时，这两个操作都没有问题，因为 List 是原始类型，并没有进行类型检查。
+
+取元素： 当你通过 list1.get(1) 取出 "Hello" 时，虽然 list1 在编译时被认为是 List<Integer>，但实际上 "Hello" 是一个 String，在运行时并没有立即发生异常。你可以打印 "Hello"，因为取出的对象仍然是 String。
+
+为什么在 System.out.println(list1.get(1).getClass()); 出现了运行时异常： 关键在于 Java 泛型在编译时的类型擦除和运行时的类型转换。
+
+编译时：list1 是一个 List<Integer>，编译器会假定从 list1 中获取的元素都是 Integer 类型。你可以通过 System.out.println(list1.get(1)) 正常输出 "Hello"，因为编译器没有对这个操作进行检查。
+运行时：在运行时，list1.get(1) 实际上返回了一个 String 对象 ("Hello")，但由于 list1 是泛型的 List<Integer>，编译器隐式地在取值时进行了类型转换（强转为 Integer），这导致了类型转换异常。
+异常发生的原因是，编译器认为 list1 只能包含 Integer，所以在运行时试图将 "Hello" 作为 Integer 返回给你。这时候会抛出 ClassCastException，因为 "Hello" 是 String 类型，不能被强制转换为 Integer。
+
+运行时异常的根源
+泛型类型擦除导致 list1 和 list2 其实是同一个对象，但 list1 在编译时被假定为只能包含 Integer。
+当你通过 list1.get(1) 取出 String 类型的 "Hello" 时，编译器尝试将它强制转换为 Integer，这是不合法的操作，因此发生了 ClassCastException。
+总结
+在 System.out.println(list1.get(1).getClass()); 处发生异常，是因为泛型的类型擦除机制导致在运行时尝试将 String 强制转换为 Integer，这违反了类型安全规则。
+
+
+您说：
+那么为什么list1.get(1)不会引发异常？
+ChatGPT 说：
+ChatGPT
+list1.get(1) 之所以不会立即引发异常，是因为在这个操作的过程中，Java 的泛型机制只是在编译时执行类型检查，而在运行时，类型信息已经被擦除，具体过程如下：
+
+1. 编译时的行为：
+在编译时，list1 被声明为 List<Integer>。这意味着编译器会认为 list1 中只能存储 Integer 类型的对象，并且编译器会假定任何从 list1 中取出来的对象都是 Integer 类型。
+因为你通过 list1.get(1) 来获取第 1 个元素，编译器认为该元素是 Integer，并不会对具体的元素做进一步检查。在编译时，编译器并不会发现在 list1 中其实存储了一个 String 类型的 "Hello"，所以没有报错。
+2. 运行时的行为（类型擦除）：
+Java 的泛型在运行时通过类型擦除来实现，这意味着在运行时，List<Integer> 和 List（原始类型）都是同一个原始的 List 类型。运行时不保留 Integer 的类型信息，list1 和 list2 实际上是同一个对象。
+当你执行 list1.get(1) 时，list1 中第 1 个元素是 "Hello"（一个 String）。此时，list1 实际上是一个包含了不同类型对象（Integer 和 String）的 List。
+由于泛型类型在运行时已经擦除，Java 不会在 list1.get(1) 这一行立即进行类型转换。这意味着从 list1 中取出的元素会被认为是一个普通的 Object，所以直接执行 list1.get(1) 并不会立刻引发 ClassCastException。
+
+3. 为什么后续会引发异常：
+当你进一步调用 list1.get(1).getClass() 时，问题才显现出来：
+
+list1.get(1) 返回的是 "Hello"，这是一个 String 类型的对象。
+由于 list1 是 List<Integer>，编译器在取出元素后会隐式地将其视为 Integer，即尝试将 String 类型的 "Hello" 转换为 Integer 类型。这是 Java 泛型的类型转换机制之一。
+但 "Hello" 不能转换为 Integer，因此在执行 list1.get(1).getClass() 时，就发生了运行时的 ClassCastException。
+总结：
+list1.get(1) 不会立即引发异常，因为在运行时，Java 的泛型类型信息已经被擦除。list1.get(1) 返回的是 Object，此时不会强制转换为 Integer，所以不会引发异常。
+当你试图获取该对象的类型（通过 getClass() 或其他操作），系统才尝试将 String 强制转换为 Integer，这时类型不匹配，才会引发 ClassCastException。
 ```
 
 
@@ -186,7 +256,7 @@ System.out.println(test.getS());这三句话为啥不会导致错误？
 从继承关系上来说: 
 
 ```java
-List<-List<?><-List<Objection>
+List<-List<?><-List<Object>
 				↑←←←←←← List<String>
 
 List<?> 表明编译器不知道所指向的List中的具体类型是什么，所以除了null什么类型的对象都不允许往里面放。
@@ -210,25 +280,29 @@ List 什么都可以往里面放。
 ```java
 Pair<? extends Employee>类型对应的方法体变为
 
-  ? extend Employee getFirst();
+  ? extend Employee  getFirst();
 	void setFirst(? extends Employee); 
-为了安全，直接不让调用了。 尽管你现在看着是 ? extends Employee 但是运行起来的时候肯定是要有一个确定的类型的，可能是 Employee 也可能是 其他任何 Employee的子类，比如是 Boss 类，根本确定不了。
-  万一你传进一个employee我放行了，但是我实际指向的是Pairs<Manager>
-  结果发生 Manager first = employee 这不就错了。所以直接不让你用了。
-  但是getFirst方法，我不管我现在指向的是什么家伙，返回的first 的类型一定是Employee或其子类，所以可以赋值给 Employee类型的引用。
 
-  所以 ? extends Employee 对应安全的访问器 不安全的修改器 ，==想要修改只能传入null==
+为了安全，直接不让调用setFirst方法了。 尽管你现在看着是 <? extends Employee> 但是运行起来的时候肯定是要有一个确定的类型的，可能是 Employee 也可能是 其他任何 Employee的子类，比如是 Boss 类，根本确定不了。比如 Pair<? extends Employee> = new Pair<Boss>(boos1,boos2);
 
-  相反 ， ? super Employee 对应安全的修改器 不安全的访问器
+此时，万一你setFirst进一个employee,我放行了，但是我的Piar中的两个元素实际是Boos类型。结果发生 Boos first = employee 这不就错了。所以直接不让你用了。但是getFirst方法，我不管我现在指向的是什么家伙，返回的first的类型一定是Employee或其子类，所以可以安全赋值给 Employee 类型的引用（向上转型）。
+
+  所以 ? extends Employee 对应安全的访问器getter 不安全的修改器setter ，==此时想要调用setter并且不报错，只能传入null==
+
+  相反， ? super Employee 对应安全的修改器 setter 不安全的访问器 getter
+  
   method(? super Employee) 可以传入任何 Employee 以及其子类的对象
-  ？super Employee get()  不能保证返回的类型是什么，只能保证可以能赋值Object类型
+  
+  ？super Employee get()  不能保证返回的类型是什么，只保证可以能赋值给Object类型的引用。
 ```
 
 <img src="/Users/yannlau/Documents/JavaSet/Java韩顺平/第1阶段_Java900P_韩顺平 + 个人理解积累补充/assets/image-20240428下午91816805.png" alt="image-20240428下午91816805" style="zoom:33%;" />
 
 直观的说，带有超类型限定的通配符，允许你写入一个泛型对象，而带有子类型限定的通配符，允许你读取一个泛型对象。
 
-
+>   所以 ? extends Employee 对应安全的访问器getter 不安全的修改器 setter
+>
+>   相反，? super Employee 对应安全的修改器 setter 不安全的访问器 getter
 
 # 通配符?和泛型类型组合的威力
 
@@ -375,6 +449,10 @@ public static <T extends Comparable<? super T>> Pair<T> minmax(T[] a){
 
 # 无限定通配符
 
+![QQ_1726211667637](/Users/yannlau/Documents/JavaSet/Java韩顺平/第1阶段_Java900P_韩顺平 + 个人理解积累补充/assets/QQ_1726211667637.png)
+
+（==但可以调用setFirst(null) 合法！==）
+
 甚至还可以使用根本无限定的通配符，例如 Pair<?>
 
 实际上，原始的Pair和Pair<?> 有很大的不同
@@ -399,10 +477,6 @@ Pair<?> 是一个泛型类型，但是泛型类型参数是未知的。
 使用通配符 <?> 表示对泛型类型参数的具体类型没有确定，但是在编译时会进行类型检查，从而提高了类型安全性。
 例如，如果你使用 Pair<?>，则无法向其中添加任何元素，因为具体的类型参数是未知的，编译器无法确保添加的元素类型与实际的类型参数兼容。
 ```
-
-# capture of ? 
-
-???
 
 # 为什么反射中常用Class<?> 而不直接用raw的Class
 
@@ -445,7 +519,7 @@ public static void swap(Pair<?> p){
 
 通配符捕获只有在非常有限的情况下是合法的。编译器必须能够保证通配符表示单个确定的类型。
 
-例如ArrayList<Pair<?>>中？不能够被捕获，因为列表中？可能包含多个不同的类型。
+例如ArrayList<Pair<?>>中？不能够被捕获，因为列表中 ？可能包含多个不同的类型。
 
 # 源码挑战
 
@@ -459,6 +533,42 @@ public static <T, U extends Comparable<? super U>> Comparator<T> comparing(Funct
         (c1, c2) -> keyExtractor.apply(c1).compareTo(keyExtractor.apply(c2));
 }
 ```
+
+现在想看懂这段代码变得容易很多
+
+1. 这段代码的目的：传入一个键提取器（一个实现了Function接口的函数），然后返回一个新的比较器，可以对提取出的健进行比较。
+
+2. Function接口的原型
+
+   ```java
+   public interface Function<T, R> {
+   
+     /**
+        * Applies this function to the given argument.
+        *
+        * @param t the function argument
+        * @return the function result
+        */
+     R apply(T t);
+   }
+   
+   public interface Function<? super T, ? extends R> {
+   
+     /**
+        * Applies this function to the given argument.
+        *
+        * @param t the function argument
+        * @return the function result
+        */
+     ? extends R apply(? supper T t);
+   }
+   ```
+
+3. 为什么要用这么多限定符来规定泛型类型的范围？根据上述的 安全的getter\安全的setter原则可以很好地理解。
+   泛型类型T是要传入的值，可以直接写为`Function<T, U> keyExtractor`而不使用限定符，但是这样会给代码增加了无谓的限制，导致有些键提取器其实可以作用于T\U，但是无法传入，因为对T进行提取操作，只要是T的子类都可以实现该操作，因此用`? super T`使得能够传入的Function实现类的范围更广。
+   本质：类型 `? super T` 可以实现的操作，T以及子类都可以实现。
+
+4. <T, U extends Comparable<? super U>>中T没什么好说的，U extends Comparable<? super U>保证了提出来的键是可以比较的，保证了compareTo方法的可用性。
 
 ## gson.reflect.TypeToken
 
